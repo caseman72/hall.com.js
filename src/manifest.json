@@ -1,0 +1,17 @@
+{
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "jquery.js", "hall.com.js" ],
+      "matches": [ "https://hall.com/rooms/*" ],
+      "run_at": "document_start"
+   } ],
+   "description": "~/.js ~ ported from ~ https://github.com/defunkt/dotjs",
+   "icons": {
+      "128": "icon128.png",
+      "48": "icon48.png"
+   },
+   "manifest_version": 2,
+   "name": "hall.com.js",
+   "permissions": [ "activeTab" ],
+   "version": "1.5"
+}

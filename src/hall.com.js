@@ -30,14 +30,13 @@ $(function() {
 			li.siblings().removeClass("b4");
 		}
 		else if (li.length) {
+			window.location.hash = hash;
 			li.addClass("hr").siblings()
 				.filter(":lt("+ li.index() +")").addClass("b4")
 					.end()
 				.filter(":gt("+ li.index() +")").removeClass("b4")
 					.end()
 				.end();
-
-			window.location.hash = hash;
 		}
 	};
 
@@ -50,14 +49,14 @@ $(function() {
 	var li_parse_user = function(li) {
 		var msg = $(li).find("div.msg:not(.lpu)");
 		var msg_html = msg.html();
-		var re_current = $.fn.re_current_user;
-		var re_user = $.fn.re_current_users;
+		var re_current = $.fn.re_current_user || {};
+		var re_user = $.fn.re_current_users || {};
 
-		if (re_current.test(msg_html)) {
+		if ("test" in re_current && re_current.test(msg_html)) {
 			msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
 			msg.html(msg_html).addClass("lpu");
 		}
-		if (re_user.test(msg_html)) {
+		if ("test" in re_user && re_user.test(msg_html)) {
 			msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>")
 			msg.html(msg_html).addClass("lpu");
 		}

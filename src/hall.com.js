@@ -47,18 +47,19 @@ $(function() {
 	 *
 	 */
 	var li_parse_user = function(li) {
-		var msg = $(li).find("div.msg:not(.lpu)");
-		var msg_html = msg.html();
 		var re_current = $.fn.re_current_user || {};
 		var re_user = $.fn.re_current_users || {};
-
-		if ("test" in re_current && re_current.test(msg_html)) {
-			msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
-			msg.html(msg_html).addClass("lpu");
-		}
-		if ("test" in re_user && re_user.test(msg_html)) {
-			msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>")
-			msg.html(msg_html).addClass("lpu");
+		var msg = $(li).find("div.msg:not(.lpu)");
+		var msg_html = msg.html();
+		if (msg_html) {
+			if ("test" in re_current && re_current.test(msg_html)) {
+				msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
+				msg.html(msg_html).addClass("lpu");
+			}
+			if ("test" in re_user && re_user.test(msg_html)) {
+				msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>")
+				msg.html(msg_html).addClass("lpu");
+			}
 		}
 	};
 
@@ -143,25 +144,27 @@ $(function() {
 							_members = true;
 							_disconnect(observer);
 
-							var current_user = $.trim($("li[data-hall-user-card]:not([data-route])", mutt.target).text());
-							$.fn.current_user = current_user;
-							$.fn.re_current_user = new RegExp("([@]?(?:" + current_user + "|" + current_user.replace(/[ ]+/g, "|") + "))", "gi");
-
 							// look for all the user names
+							var current_user = [];
 							var current_users = [];
-							var re_array = [];
 							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
 								var node = mutt.addedNodes[j];
 								if (node.nodeName == "LI") {
-									var user = $.trim($(node).text());
-									if (user != current_user) {
-										current_users.push(user);
-										re_array.push(user, user.replace(/[ ]+/g, "|"));
+									var li = $(node);
+									var user = $.trim(li.find("span[data-hall-user-id]").text());
+									if (user) {
+										if (li.attr("data-route")) {
+											current_users.push(user, user.replace(/[ ]+/g, "|"));
+										}
+										else {
+											current_user.push(user, user.replace(/[ ]+/g, "|"));
+										}
 									}
 								}
 							}
-							$.fn.current_users = current_users;
-							$.fn.re_current_users = new RegExp("([@]?(?:" + re_array.join("|")  + "))", "gi");
+							// pass to global scope
+							$.fn.re_current_users = new RegExp("([@]?(?:" + current_users.join("|")  + "))", "gi");
+							$.fn.re_current_user = new RegExp("([@]?(?:" + current_user.join("|") + "))", "gi");
 						}
 					}
 				}
@@ -191,7 +194,7 @@ $(function() {
 		.on("click", "time", function(e) {
 			li_handler( $(e.currentTarget).closest("li.hall-listview-li") );
 		})
-		.on("click", "li[data-hall-user-card]:not([data-route])", function(e) {
+		.on("click", "li[data-hall-user-id]:not([data-route])", function(e) {
 			//
 			// clicked on the current user
 			//

@@ -2,6 +2,7 @@
 // NB: FF version use MutationObserver
 //
 $(function() {
+	/*
 	// my styles / fixes
 	var style = [];
 	style.push('textarea:-moz-placeholder { color: #ADB6BF !important; }');
@@ -10,7 +11,44 @@ $(function() {
 	style.push('li.current_user { background-color: rgba(82,168,236,0.08); }');
 	style.push('span.curr { background-color: rgba(255, 31, 63, 0.2); border-radius: 3px; }');
 	style.push('span.user { background-color: rgba(123, 123, 123, 0.2); border-radius: 3px; }');
-	$("head").append("<style>" + style.join("") + "</style>");
+
+	style.push('.sh_typical {background:none; padding:0; margin:0; border:0 none;}');
+	style.push('.sh_typical .sh_sourceCode {background-color:#f6f6f6;color:#000;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_keyword {color:#00c;font-weight:bold;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_type {color:#00c;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_string {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_regexp {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_specialchar {color:#C42DA8;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_comment {color:#0c0;font-weight:normal;font-style:italic;}');
+	style.push('.sh_typical .sh_sourceCode .sh_number {color:#a900a9;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_preproc {color:#666;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_symbol {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_function {color:#000;font-weight:bold;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_cbracket {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_url {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_date {color:#00c;font-weight:bold;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_time {color:#00c;font-weight:bold;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_file {color:#00c;font-weight:bold;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_ip {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_name {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_variable {color:#ec7f15;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_oldfile {color:#C42DA8;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_newfile {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_difflines {color:#00c;font-weight:bold;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_selector {color:#ec7f15;font-weight:normal;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_property {color:#00c;font-weight:bold;font-style:normal;}');
+	style.push('.sh_typical .sh_sourceCode .sh_value {color:#c00;font-weight:normal;font-style:normal;}');
+	style.push('.snippet-wrap .snippet-menu pre, .snippet-wrap .snippet-hide pre {background-color:transparent; margin:0; padding:0;}');
+	style.push('.snippet-wrap .snippet-menu a, .snippet-wrap .snippet-hide a {padding:0 5px; text-decoration:underline;}');
+	style.push('.snippet-wrap pre.sh_sourceCode {padding:0;line-height:1.5em;overflow:auto;position:relative;-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;border: 1px dotted #999}');
+	style.push('.snippet-wrap .snippet-no-num {list-style:none; padding:.2em 0.5em; margin:0;}');
+	style.push('.snippet-wrap .snippet-no-num li {list-style:none; padding-left:0;}');
+	style.push('.snippet-wrap .snippet-num li {padding-left:1.5em;}');
+	style.push('.snippet-wrap .snippet-num {margin:0; padding-left:3em;}');
+	style.push('.snippet-wrap .snippet-num li {list-style:decimal-leading-zero outside none;}');
+
+	$("head").append("<style>\n" + style.join("\n") + "\n</style>");
+	*/
 
 
 	/**
@@ -59,6 +97,24 @@ $(function() {
 			if ("test" in re_user && re_user.test(msg_html)) {
 				msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>")
 				msg.html(msg_html).addClass("lpu");
+			}
+
+			var re_source_code = $.fn.re_source_code;
+			var srcs = {};
+			var changed = false;
+			var parts;
+			if ("test" in re_source_code) {
+				while (parts = re_source_code.exec(msg_html)) {
+					msg_html = msg_html.replace(re_source_code, '<pre class="'+ (parts[1] || "js") +'">'+ parts[2] +'</pre>');
+					srcs[(parts[1] || "js")] = true;
+					changed = true;
+				}
+				if (changed) {
+					msg.html(msg_html);
+					for (src in srcs) {
+						msg.find("pre."+src).snippet(src, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)}); // phone numbers are 7 digits ~ most a person can remember
+					}
+				}
 			}
 		}
 	};
@@ -165,6 +221,8 @@ $(function() {
 							// pass to global scope
 							$.fn.re_current_users = new RegExp("([@]?(?:" + current_users.join("|")  + "))", "gi");
 							$.fn.re_current_user = new RegExp("([@]?(?:" + current_user.join("|") + "))", "gi");
+							$.fn.re_source_code = /(^|html|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/;
+
 						}
 					}
 				}

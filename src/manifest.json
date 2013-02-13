@@ -1,11 +1,12 @@
 {
    "content_scripts": [ {
       "all_frames": true,
-      "js": [ "jquery.js", "hall.com.js" ],
+      "css": [ "hall.com.css" ],
+      "js": [ "jquery-1.8.3.min.js", "jquery.snippet.min.js", "hall.com.js" ],
       "matches": [ "https://hall.com/rooms/*" ],
       "run_at": "document_start"
    } ],
-   "description": "~/.js ~ ported from ~ https://github.com/defunkt/dotjs",
+   "description": "~/.js ~ ported from https://github.com/defunkt/dotjs and jquery.snippet.js ~ from http://www.steamdev.com/snippet/",
    "icons": {
       "128": "icon128.png",
       "48": "icon48.png"
@@ -13,5 +14,5 @@
    "manifest_version": 2,
    "name": "hall.com.js",
    "permissions": [ "activeTab" ],
-   "version": "1.5"
+   "version": "1.5.1"
 }

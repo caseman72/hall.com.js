@@ -12,7 +12,7 @@
       "48": "icon48.png"
    },
    "manifest_version": 2,
-   "name": "hall.com.js",
+   "name": "hall.com.hl.js",
    "permissions": [ "activeTab" ],
    "version": "1.5.1"
 }

@@ -38,7 +38,7 @@ $(function() {
 	var li_parse_user = function(li) {
 		var re_current = $.fn.re_current_user || {};
 		var re_user = $.fn.re_current_users || {};
-		var msg = $(li).find("div.msg:not(.lpu)");
+		var msg = $(li).find(".msg:not(.lpu)");
 		var msg_html = msg.html();
 		if (msg_html) {
 			if ("test" in re_current && re_current.test(msg_html)) {

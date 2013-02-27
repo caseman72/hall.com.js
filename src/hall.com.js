@@ -2,6 +2,7 @@
 // NB: FF version use MutationObserver
 //
 $(function() {
+	$.fn.re_source_code = /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/;
 	/**
 	 *
 	 * when you click on the <time> it passes the parent li here
@@ -50,7 +51,7 @@ $(function() {
 				msg.html(msg_html).addClass("lpu");
 			}
 
-			var re_source_code = $.fn.re_source_code;
+			var re_source_code = $.fn.re_source_code || {};
 			var srcs = {};
 			var changed = false;
 			var parts;
@@ -172,7 +173,6 @@ $(function() {
 							// pass to global scope
 							$.fn.re_current_users = new RegExp("([@]?(?:" + current_users.join("|")  + "))", "gi");
 							$.fn.re_current_user = new RegExp("([@]?(?:" + current_user.join("|") + "))", "gi");
-							$.fn.re_source_code = /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/;
 						}
 					}
 				}

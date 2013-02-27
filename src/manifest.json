@@ -14,5 +14,5 @@
    "manifest_version": 2,
    "name": "hall.com.js",
    "permissions": [ "activeTab" ],
-   "version": "1.5.1"
+   "version": "1.5.2"
 }

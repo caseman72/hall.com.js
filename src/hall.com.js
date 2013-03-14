@@ -4,7 +4,6 @@
 $(function() {
 	$.fn.re_source_code = /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/;
 	/**
-	 *
 	 * when you click on the <time> it passes the parent li here
 	 * if the hash == time - clear
 	 * else make the li's above the time fade
@@ -30,13 +29,38 @@ $(function() {
 		}
 	};
 
+	var parse_members = function() {
+		var current_user = [];
+		var current_users = [];
+		var members = $(".hall-listview-members").find("li");
+
+		members.each(function(i, li) {
+			var user = $.trim(li.find("span[data-hall-user-id]").text());
+			if (user) {
+				if (li.attr("data-route")) {
+					current_users.push(user, user.replace(/[ ]+/g, "|"));
+				}
+				else {
+					current_user.push(user, user.replace(/[ ]+/g, "|"));
+				}
+			}
+		});
+
+		// pass to global scope
+		$.fn.re_current_users = new RegExp("([@]?(?:" + current_users.join("|")  + "))", "gi");
+		$.fn.re_current_user = new RegExp("([@]?(?:" + current_user.join("|") + "))", "gi");
+	};
+
 
 	/**
-	 *
 	 * when new li's show up this parses the users in the msg div
 	 *
 	 */
 	var li_parse_user = function(li) {
+		if (typeof $.fn.re_current_user == "undefined" || typeof $.fn.re_current_users == "undefined") {
+			parse_members(); // backup
+		};
+
 		var re_current = $.fn.re_current_user || {};
 		var re_user = $.fn.re_current_users || {};
 		var msg = $(li).find(".msg:not(.lpu)");
@@ -73,7 +97,6 @@ $(function() {
 
 
 	/**
-	 *
 	 * DOM watcher listening for new LI's ~ allways on
 	 *
 	 */
@@ -106,7 +129,6 @@ $(function() {
 
 
 	/**
-	 *
 	 * At startup we need to find the LI's so we can parse them
 	 * Also we can find the Members and add them to the jQuery scope
 	 *
@@ -124,6 +146,9 @@ $(function() {
 					li_parse_user(li);
 					hash && (li = $(li), li.data("id") == hash && li_handler(li));
 				}
+
+				// watch the chat messages for new ones (or old ones)
+				ol_watch();
 			}
 		};
 
@@ -133,9 +158,6 @@ $(function() {
 				if (mutt.type == "childList" && mutt.addedNodes.length > 0) {
 					if (mutt.target.nodeName == "OL") {
 						if (mutt.target.className.match(/hall-listview-chat/)) {
-							_chat = true;
-							_disconnect(observer); // want to do this early
-
 							// add all the new messages so we can parse them
 							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
 								var node = mutt.addedNodes[j];
@@ -144,14 +166,11 @@ $(function() {
 								}
 							}
 
-							// watch the chat messages for new ones (or old ones)
-							ol_watch();
-
+							// this needs to go last otherwise _nodes.length == 0
+							_chat = true;
+							_disconnect(observer);
 						}
 						else if (mutt.target.className.match(/hall-listview-members/)) {
-							_members = true;
-							_disconnect(observer);
-
 							// look for all the user names
 							var current_user = [];
 							var current_users = [];
@@ -173,6 +192,10 @@ $(function() {
 							// pass to global scope
 							$.fn.re_current_users = new RegExp("([@]?(?:" + current_users.join("|")  + "))", "gi");
 							$.fn.re_current_user = new RegExp("([@]?(?:" + current_user.join("|") + "))", "gi");
+
+							// this needs to go last otherwise regex is undefined
+							_members = true;
+							_disconnect(observer);
 						}
 					}
 				}
@@ -194,7 +217,6 @@ $(function() {
 
 
 	/**
-	 *
 	 * document click events ...
 	 *
 	 */

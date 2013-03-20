@@ -47,8 +47,8 @@ $(function() {
 		});
 
 		// pass to global scope
-		$.fn.re_current_users = new RegExp("([@]?(?:" + current_users.join("|")  + "))", "gi");
-		$.fn.re_current_user = new RegExp("([@]?(?:" + current_user.join("|") + "))", "gi");
+		$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
+		$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
 	};
 
 
@@ -190,8 +190,8 @@ $(function() {
 								}
 							}
 							// pass to global scope
-							$.fn.re_current_users = new RegExp("([@]?(?:" + current_users.join("|")  + "))", "gi");
-							$.fn.re_current_user = new RegExp("([@]?(?:" + current_user.join("|") + "))", "gi");
+							$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
+							$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
 
 							// this needs to go last otherwise regex is undefined
 							_members = true;

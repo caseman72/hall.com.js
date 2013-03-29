@@ -30,29 +30,56 @@ $(function() {
 	};
 
 	var parse_members = function() {
-		var current_user = [];
-		var current_users = [];
-		var members = $(".hall-listview-members").find("li");
+		if ($.fn.downloading) return;
 
-		members.each(function(i, li) {
-			li = $(li);
-			var user = $.trim(li.find("span[data-hall-user-id]").text());
+		if (typeof $.fn.re_current_user == "undefined") {
+			var user = $(".hall-listview-members").find("li[data-route]").find("span[data-hall-user-id]").text();
 			if (user) {
-				if (li.attr("data-route")) {
-					current_users.push(user, user.replace(/[ ]+/g, "|"));
-				}
-				else {
-					current_user.push(user, user.replace(/[ ]+/g, "|"));
-				}
+				user = [user, user.replace(/[ ]+/g, "|")].join("|");
+				$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:"+ user +"))(?:$|\\b)", "gi");
 			}
-		});
-
-		// pass to global scope
-		if (current_users.length > 0){
-			$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
 		}
-		if (current_user.length > 0) {
-			$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
+
+		if (typeof $.fn.re_current_users == "undefined") {
+			$.fn.downloading = true;
+
+			var current_user_id = "";
+			if (typeof $.fn.re_current_user == "undefined") {
+				current_user_id = ($("li.current-user").find("a[data-route]").data("route") || "").replace(/^\/users\//, "");
+			}
+
+			$.get("https://hall.com/api/1/halls/27920174f0/hall_members?_=" + (new Date().getTime()), function(data) {
+				data = (!data || (typeof data.length !== 'number')) ? [] : data;
+
+				var current_user = [];
+				var current_users = [];
+				for(var i=0,n=data.length; i<n; i++) {
+					var user = data[i];
+					var list = (user.user_id && user.user_id == current_user_id) ? current_user : current_users;
+					list.push(user.full_name), user.fname && list.push(user.fname), user.lname && list.push(user.lname);
+				};
+
+				if (current_user.length > 0){
+					$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|")  + "))(?:$|\\b)", "gi");
+				}
+				if (current_users.length > 0){
+					$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
+				}
+
+				li_parse_all();
+
+				$.fn.downloading = false;
+			});
+		}
+	};
+
+
+	/**
+	 * reparse all li's
+	 */
+	var li_parse_all = function() {
+		if (typeof $.fn.re_current_user != "undefined" && typeof $.fn.re_current_users != "undefined") {
+			$(".hall-listview-chat").find("li").each(function(i, li) { li_parse_user(li); });
 		}
 	};
 
@@ -62,8 +89,10 @@ $(function() {
 	 *
 	 */
 	var li_parse_user = function(li) {
+		// this will reparse
 		if (typeof $.fn.re_current_user == "undefined" || typeof $.fn.re_current_users == "undefined") {
-			parse_members(); // backup
+			parse_members();
+			return;
 		};
 
 		var re_current = $.fn.re_current_user || {};

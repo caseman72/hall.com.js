@@ -35,6 +35,7 @@ $(function() {
 		var members = $(".hall-listview-members").find("li");
 
 		members.each(function(i, li) {
+			li = $(li);
 			var user = $.trim(li.find("span[data-hall-user-id]").text());
 			if (user) {
 				if (li.attr("data-route")) {
@@ -47,8 +48,12 @@ $(function() {
 		});
 
 		// pass to global scope
-		$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
-		$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
+		if (current_users.length > 0){
+			$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
+		}
+		if (current_user.length > 0) {
+			$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
+		}
 	};
 
 
@@ -189,9 +194,14 @@ $(function() {
 									}
 								}
 							}
+
 							// pass to global scope
-							$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
-							$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
+							if (current_users.length > 0){
+								$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
+							}
+							if (current_user.length > 0) {
+								$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
+							}
 
 							// this needs to go last otherwise regex is undefined
 							_members = true;

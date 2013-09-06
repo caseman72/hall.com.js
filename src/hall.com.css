@@ -2,6 +2,7 @@ textarea:-moz-placeholder {color: #ADB6BF !important;}
 li.hr {border-bottom: 2px solid #999; opacity: 0.2 }
 li.b4 {opacity: 0.2;}
 li.current_user {background-color: rgba(82,168,236,0.08);}
+li.git_bot {background-color: rgba(236,168,82,0.08);}
 span.curr {background-color: rgba(255, 31, 63, 0.2); border-radius: 3px;}
 span.user {background-color: rgba(123, 123, 123, 0.2); border-radius: 3px;}
 .sh_typical {background:none; padding:0; margin:0; border:0 none;}
@@ -40,3 +41,4 @@ span.user {background-color: rgba(123, 123, 123, 0.2); border-radius: 3px;}
 .snippet-wrap .snippet-num {padding: .5em .5em .5em 3em; margin: 0;}
 .snippet-wrap .snippet-num li {list-style:decimal-leading-zero outside none; padding:0; margin:0;}
 pre.msg code {font: 13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;}
+li.sed {display:none;}

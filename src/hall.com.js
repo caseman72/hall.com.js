@@ -2,75 +2,183 @@
 // NB: FF version use MutationObserver
 //
 $(function() {
-	$.fn.re_source_code = /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/;
+	/**
+	 * global object to store hall specific items in
+	 */
+	$.hall_object = {
+		// regexes
+		re_source: /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/,
+		re_current: {test: function() { return false; }},
+		re_user: {test: function() { return false; }},
+		re_hr: /\n?[-]{10,50}/g,
+		// hashes
+		ols: {},
+		bots: {},
+		rooms: {},
+		current_user: {},
+		current_users: {},
+		// states
+		states: {
+			init: 0,
+			running: 1,
+			done: 2
+		}
+	};
+
 	/**
 	 * when you click on the <time> it passes the parent li here
 	 * if the hash == time - clear
 	 * else make the li's above the time fade
-	 *
 	 */
-	var li_handler = function(li) {
+	var li_handler = function($li) {
 		var found = $(".hr").removeClass("hr b4").length;
-		var hash = "#"+ li.data("id");
+		var hash = "#"+ $li.data("id");
 
-		// click again to clear
-		if (window.location.hash == hash && found) {
+		if (found && window.location.hash == hash) {
+			// click again to clear
 			window.location.hash = "";
-			li.siblings().removeClass("b4");
+			$li.siblings().removeClass("b4");
 		}
-		else if (li.length) {
+		else if ($li.length) {
+			// click to set
 			window.location.hash = hash;
-			li.addClass("hr").siblings()
-				.filter(":lt("+ li.index() +")").addClass("b4")
+			$li.addClass("hr").siblings()
+				.filter(":lt("+ $li.index() +")").addClass("b4")
 					.end()
-				.filter(":gt("+ li.index() +")").removeClass("b4")
+				.filter(":gt("+ $li.index() +")").removeClass("b4")
 					.end()
 				.end();
 		}
 	};
 
-	var parse_members = function() {
-		if ($.fn.downloading) return;
 
-		if (typeof $.fn.re_current_user == "undefined") {
-			var user = $(".hall-listview-members").find("li[data-route]").find("span[data-hall-user-id]").text();
-			if (user) {
-				user = [user, user.replace(/[ ]+/g, "|")].join("|");
-				$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:"+ user +"))(?:$|\\b)", "gi");
-			}
+	/**
+	 * check to see if all rooms are processed
+	 */
+	var rooms_done = function() {
+		var $options = $.hall_object;
+
+		// if no keys - not done
+		var all_done = Object.keys($options.rooms).length > 0;
+		for (var id in $options.rooms) {
+			all_done = all_done && $options.rooms[id] == $options.states.done;
 		}
 
-		if (typeof $.fn.re_current_users == "undefined") {
-			$.fn.downloading = true;
+		return all_done;
+	};
 
-			var current_user_id = "";
-			if (typeof $.fn.re_current_user == "undefined") {
-				current_user_id = ($("li.current-user").find("a[data-route]").data("route") || "").replace(/^\/users\//, "");
+
+	/**
+	 * create regext each time ...
+	 */
+	var get_user_regex = function(collection) {
+		// base function that fails all tests
+		var regex = {test: function() { return false; }};
+
+		// collection has values
+		if (Object.keys(collection).length) {
+			var list = [];
+			for (var key in collection) {
+				list.push(collection[key]);
 			}
-
-			$.get("https://hall.com/api/1/halls/27920174f0/hall_members?_=" + (new Date().getTime()), function(data) {
-				data = (!data || (typeof data.length !== 'number')) ? [] : data;
-
-				var current_user = [];
-				var current_users = [];
-				for(var i=0,n=data.length; i<n; i++) {
-					var user = data[i];
-					var list = (user.user_id && user.user_id == current_user_id) ? current_user : current_users;
-					list.push(user.full_name), user.fname && list.push(user.fname), user.lname && list.push(user.lname);
-				};
-
-				if (current_user.length > 0){
-					$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|")  + "))(?:$|\\b)", "gi");
-				}
-				if (current_users.length > 0){
-					$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
-				}
-
-				li_parse_all();
-
-				$.fn.downloading = false;
-			});
+			// update with list join by 'OR'
+			regex = new RegExp("((?:^|[@]|\\b)(?:" + list.join("|")  + "))(?:$|\\b)", "gi");
 		}
+
+		return regex;
+	};
+
+
+	/**
+	 * parse user data from json requests - when all done re-parse all li's
+	 */
+	var parse_user_data = function(data) {
+		// must be an array ...
+		data = (!data || (typeof data.length !== "number")) ? [] : data;
+
+		var current_user = $(".user-settings:first").find(".current-user").find(".fullname").text();
+
+		var $options = $.hall_object;
+		for (var i=0,n=data.length; i<n; i++) {
+			var display_name = ""+data[i].display_name;
+
+			// user name logic
+			var user = data[i].user;
+
+			// job title is our flag for bots
+			if (user.job_title == "git-bot") {
+				$options.bots[display_name] = user;
+			}
+			else {
+				if (user.fname && user.lname) {
+					if (user.lname.length < 4) {
+						user = [display_name, user.fname, user.fname+user.lname[0]].join("|");
+					}
+					else {
+						user = [display_name, display_name.replace(/[ ]+/g, "|"), user.fname+user.lname[0]].join("|");
+					}
+				}
+				else {
+					user = display_name;
+				}
+
+				// current_user or users
+				if (display_name == current_user) {
+					if (!(display_name in $options.current_user)) {
+						$options.current_user[display_name] = user;
+					}
+				}
+				else if (!(display_name in $options.current_users)) {
+					$options.current_users[display_name] = user;
+				}
+			}
+		};
+
+		// update room to processed
+		$options.rooms[this.room_id] = $options.states.done;
+
+		// check for all done - parse all if so
+		if (rooms_done()) {
+			$options.re_current = get_user_regex($options.current_user);
+			$options.re_user = get_user_regex($options.current_users);
+
+			li_parse_all();
+		}
+	};
+
+
+	/**
+	 * parse members from room links
+	 */
+	var parse_room_links = function() {
+		var $options = $.hall_object;
+
+		// this may fail in other instance if :first isn't the main place for members
+		var rooms = $(".rooms:first").find("a[data-route^='rooms']");
+
+		// init loop to define all rooms as not-processed
+		rooms.each(function(i, elem) {
+			var room_id = ($(elem).data("route") || "").replace(/^rooms\/([^\/]+)\/?.*$/, "$1");
+			if (room_id) {
+				$(elem).data("room-id", room_id);
+				if (!(room_id in $options.rooms)) {
+					$options.rooms[room_id] = $options.states.init
+				}
+			}
+		});
+
+		// second loop to 'get' rooms if not-processed
+		rooms.each(function(i, elem) {
+			var room_id = $(elem).data("room-id");
+			if (room_id && (room_id in $options.rooms) && $options.rooms[room_id] == $options.states.init) {
+				$options.rooms[room_id] = $options.states.running;
+				$.ajax({
+					type: "GET",
+					url: "https://hall.com/api/1/rooms/groups/" +room_id+ "/room_members?_=" + (new Date().getTime()),
+					context: {room_id: room_id} // pass in room_id to be marked as done
+				}).done(parse_user_data);
+			}
+		});
 	};
 
 
@@ -78,8 +186,18 @@ $(function() {
 	 * reparse all li's
 	 */
 	var li_parse_all = function() {
-		if (typeof $.fn.re_current_user != "undefined" && typeof $.fn.re_current_users != "undefined") {
-			$(".hall-listview-chat").find("li").each(function(i, li) { li_parse_user(li); });
+		var $options = $.hall_object;
+
+		if (rooms_done()) {
+			$(".hall-listview-chat").find("li").each(function(i, li) {
+				li_parse_user(li, "li_parse_all");
+			});
+
+			// watch the chat messages for new ones (or old ones)
+			ol_watch();
+		}
+		else {
+			parse_room_links();
 		}
 	};
 
@@ -88,76 +206,108 @@ $(function() {
 	 * when new li's show up this parses the users in the msg div
 	 *
 	 */
-	var li_parse_user = function(li) {
+	var li_parse_user = function(li, location) {
 		// this will reparse
-		if (typeof $.fn.re_current_user == "undefined" || typeof $.fn.re_current_users == "undefined") {
-			parse_members();
-			return;
-		};
+		if (!rooms_done()) {
+			parse_room_links();
+			return false;
+		}
 
-		var re_current = $.fn.re_current_user || {};
-		var re_user = $.fn.re_current_users || {};
-		var msg = $(li).find(".msg:not(.lpu)");
+		// regex
+		var $options = $.hall_object;
+		var re_current = $options.re_current;
+		var re_user = $options.re_user;
+		var re_hr = $options.re_hr;
+
+		var $li = $(li);
+		var msg = $li.find(".msg:not(.lpu)");
 		var msg_html = msg.html();
 		if (msg_html) {
-			if ("test" in re_current && re_current.test(msg_html)) {
+			// current
+			if (re_current.test(msg_html)) {
 				msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
 				msg.html(msg_html).addClass("lpu");
 			}
-			if ("test" in re_user && re_user.test(msg_html)) {
+
+			// users
+			if (re_user.test(msg_html)) {
 				msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>")
 				msg.html(msg_html).addClass("lpu");
 			}
 
-			var re_source_code = $.fn.re_source_code || {};
-			var srcs = {};
+			// horizontal rule
+			if (re_hr.test(msg_html)) {
+				msg_html = msg_html.replace(re_hr, "<hr/>")
+				msg.html(msg_html).addClass("lpu");
+			}
+
+			// source code
+			var re_source = $options.re_source;
 			var changed = false;
-			var parts;
-			if ("test" in re_source_code) {
-				while (parts = re_source_code.exec(msg_html)) {
-					msg_html = msg_html.replace(re_source_code, '<pre class="'+ (parts[1] || "js") +'">'+ parts[2] +'</pre>');
-					srcs[(parts[1] || "js")] = true;
-					changed = true;
-				}
-				if (changed) {
-					msg.html(msg_html);
-					for (src in srcs) {
-						msg.find("pre."+src).snippet(src, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)}); // phone numbers are 7 digits ~ most a person can remember
-					}
+			var srcs = {};
+			var parts = null;
+
+			while (parts = re_source.exec(msg_html)) {
+				msg_html = msg_html.replace(re_source, '<pre class="'+ (parts[1] || "js") +'">'+ parts[2] +"</pre>");
+				srcs[(parts[1] || "js")] = true;
+				changed = true;
+			}
+			if (changed) {
+				msg.html(msg_html);
+				for (src in srcs) {
+					msg.find("pre."+src).snippet(src, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)}); // phone numbers are 7 digits ~ most a person can remember
 				}
 			}
 		}
+
+		// robot message
+		var cite = $li.find("cite").text();
+		if (cite) {
+			for (var display_name in $options.bots) {
+				cite == display_name && $li.addClass("git_bot"); // underscore to match hall.com's classes
+			}
+		}
+
+		return true;
 	};
 
 
 	/**
 	 * DOM watcher listening for new LI's ~ allways on
-	 *
 	 */
 	var ol_watch = function() {
-		var observer = new WebKitMutationObserver(function(mutations, observer) {
-			// fired when a mutation occurs
-			for (var i=0,n=mutations.length; i<n; i++) {
-				var mutt = mutations[i];
-				if (mutt.type == "childList" && mutt.addedNodes.length > 0) {
-					for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
-						var node = mutt.addedNodes[j];
-						li_parse_user(node);
-					}
-				}
-			}
-		});
+		var $options = $.hall_object;
 
-		// define what element should be observed by the observer
-		// and what types of mutations trigger the callback
-		observer.observe( $(".hall-listview-viewport").get(0).childNodes[0], {
-			subtree: false,
-			childList: true,
-			attributes: false,
-			characterData: false,
-			attributeOldValue: false,
-			characterDataOldValue: false
-			//...
+		$(".hall-listview-viewport").each(function(i, viewport) {
+			// find all viewports and watch them for more messages
+			var wrapper_id = $(viewport).parents(".app-page").attr("id");
+			if (wrapper_id && !(wrapper_id in $options.ols)) {
+				$options.ols[wrapper_id] = true;
+
+				var observer = new WebKitMutationObserver(function(mutations, obs) {
+					// fired when a mutation occurs - up top
+					for (var i=0,n=mutations.length; i<n; i++) {
+						var mutt = mutations[i];
+						if (mutt.type == "childList" && mutt.addedNodes.length > 0) {
+							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
+								li_parse_user(mutt.addedNodes[j], "ol_watch");
+							}
+						}
+					}
+				});
+
+				// define what element should be observed by the observer
+				// and what types of mutations trigger the callback
+				observer.observe(viewport.childNodes[0], {
+					subtree: false,
+					childList: true,
+					attributes: false,
+					characterData: false,
+					attributeOldValue: false,
+					characterDataOldValue: false
+					//...
+				});
+			}
 		});
 	};
 
@@ -170,23 +320,21 @@ $(function() {
 	 */
 	var document_watch = function() {
 		var _chat = false;
-		var _members = false;
 		var _nodes = [];
 
 		// used jsmin to minimize this method ... too many if / if / if
 		var _disconnect = function(observer) {
-			if (_chat && _members && (observer.disconnect(), _nodes.length)) {
-				for (var hash = window.location.hash ? ("" + window.location.hash).substring(1) : null, li; li = _nodes.pop();) {
-					li_parse_user(li);
-					hash && (li = $(li), li.data("id") == hash && li_handler(li));
+			if (_chat && (observer.disconnect(), _nodes.length)) {
+				// do the hash stuff here
+				for (var hash = window.location.hash ? window.location.hash.slice(1) : false, li; hash && (li = _nodes.pop());) {
+					li = $(li), li.data("id") == hash && li_handler(li);
 				}
-
-				// watch the chat messages for new ones (or old ones)
-				ol_watch();
+				// parse the old fashion way
+				li_parse_all();
 			}
 		};
 
-		var _observer = new WebKitMutationObserver(function(mutations, observer) {
+		var observer = new WebKitMutationObserver(function(mutations, obs) {
 			for (var i=0,n=mutations.length; i<n; i++) {
 				var mutt = mutations[i];
 				if (mutt.type == "childList" && mutt.addedNodes.length > 0) {
@@ -204,45 +352,13 @@ $(function() {
 							_chat = true;
 							_disconnect(observer);
 						}
-						else if (mutt.target.className.match(/hall-listview-members/)) {
-							// look for all the user names
-							var current_user = [];
-							var current_users = [];
-							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
-								var node = mutt.addedNodes[j];
-								if (node.nodeName == "LI") {
-									var li = $(node);
-									var user = $.trim(li.find("span[data-hall-user-id]").text());
-									if (user) {
-										if (li.attr("data-route")) {
-											current_users.push(user, user.replace(/[ ]+/g, "|"));
-										}
-										else {
-											current_user.push(user, user.replace(/[ ]+/g, "|"));
-										}
-									}
-								}
-							}
-
-							// pass to global scope
-							if (current_users.length > 0){
-								$.fn.re_current_users = new RegExp("((?:^|[@]|\\b)(?:" + current_users.join("|")  + "))(?:$|\\b)", "gi");
-							}
-							if (current_user.length > 0) {
-								$.fn.re_current_user = new RegExp("((?:^|[@]|\\b)(?:" + current_user.join("|") + "))(?:$|\\b)", "gi");
-							}
-
-							// this needs to go last otherwise regex is undefined
-							_members = true;
-							_disconnect(observer);
-						}
 					}
 				}
 			}
 			_disconnect(observer);
 		});
 
-		_observer.observe( document, {
+		observer.observe(document, {
 			subtree: true,
 			childList: true,
 			attributes: false,
@@ -252,20 +368,25 @@ $(function() {
 			//...
 		});
 	};
-	document_watch();
 
+	// only needs to run on start - watches DOM mutations 
+	document_watch();
 
 	/**
 	 * document click events ...
-	 *
 	 */
 	$(document)
 		.on("click", "time", function(e) {
-			li_handler( $(e.currentTarget).closest("li.hall-listview-li") );
+			li_handler($(e.currentTarget).closest("li.hall-listview-li"));
 		})
-		.on("click", "li[data-hall-user-id]:not([data-route])", function(e) {
-			//
-			// clicked on the current user
-			//
+		.on("click", "a[data-route]", function(e) {
+			// quick 4x @ 250
+			for(var i=1; i<5; i++) {
+				setTimeout(li_parse_all, i*250);
+			}
+			// jic 4x @ 1K
+			for(var i=1; i<5; i++) {
+				setTimeout(li_parse_all, i*1000);
+			}
 		});
 });

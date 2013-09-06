@@ -10,7 +10,7 @@ $(function() {
 		re_source: /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/,
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
-		re_hr: /\n?[-]{10,50}/g,
+		re_hr: /\n?[-]{10,}/g,
 		// hashes
 		ols: {},
 		bots: {},

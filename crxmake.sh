@@ -64,7 +64,7 @@ zip="$name.zip"
 trap 'rm -f "$pub" "$sig" "$zip"' EXIT
 
 # zip up the crx dir
-(cd "$src" && zip -qr -9 -X "$cwd/$zip" .)
+(cd "$src" && zip -qr -9 -X "$cwd/$zip" .  -x \*.rcs\*)
 
 # signature
 openssl sha1 -sha1 -binary -sign "$pem" < "$zip" > "$sig"

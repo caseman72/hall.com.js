@@ -207,64 +207,67 @@ $(function() {
 	 *
 	 */
 	var li_parse_user = function(li, location) {
+		var $options = $.hall_object;
+
 		// this will reparse
 		if (!rooms_done()) {
 			parse_room_links();
 			return false;
 		}
 
-		// regex
-		var $options = $.hall_object;
-		var re_current = $options.re_current;
-		var re_user = $options.re_user;
-		var re_hr = $options.re_hr;
-
 		var $li = $(li);
-		var msg = $li.find(".msg:not(.lpu)");
-		var msg_html = msg.html();
-		if (msg_html) {
+		var msg = $li.find(".msg:not(.lip)");
+		if (msg.length) {
+			var msg_html = msg.addClass("lip").html();
+
 			// current
+			var re_current = $options.re_current;
 			if (re_current.test(msg_html)) {
 				msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
-				msg.html(msg_html).addClass("lpu");
+				msg.html(msg_html);
 			}
 
 			// users
+			var re_user = $options.re_user;
 			if (re_user.test(msg_html)) {
 				msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>")
-				msg.html(msg_html).addClass("lpu");
+				msg.html(msg_html);
 			}
 
 			// horizontal rule
+			var re_hr = $options.re_hr;
 			if (re_hr.test(msg_html)) {
 				msg_html = msg_html.replace(re_hr, "<hr/>")
-				msg.html(msg_html).addClass("lpu");
+				msg.html(msg_html);
 			}
+
+			var changed = false;
+			var parts = null;
+			var srcs = {};
 
 			// source code
 			var re_source = $options.re_source;
-			var changed = false;
-			var srcs = {};
-			var parts = null;
-
 			while (parts = re_source.exec(msg_html)) {
 				msg_html = msg_html.replace(re_source, '<pre class="'+ (parts[1] || "js") +'">'+ parts[2] +"</pre>");
 				srcs[(parts[1] || "js")] = true;
 				changed = true;
 			}
+
 			if (changed) {
 				msg.html(msg_html);
-				for (src in srcs) {
-					msg.find("pre."+src).snippet(src, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)}); // phone numbers are 7 digits ~ most a person can remember
+				for (var src in srcs) {
+					// phone numbers are 7 digits ~ most a person can remember
+					msg.find("pre."+src).snippet(src, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)});
 				}
 			}
-		}
 
-		// robot message
-		var cite = $li.find("cite").text();
-		if (cite) {
-			for (var display_name in $options.bots) {
-				cite == display_name && $li.addClass("git_bot"); // underscore to match hall.com's classes
+			// robot message
+			var cite = $li.find("cite:not(.gbp)");
+			if (cite.length) {
+				var cite_text = cite.addClass("gbp").text();
+				for (var name in $options.bots) {
+					cite_text == name && $li.addClass("git_bot");
+				}
 			}
 		}
 
@@ -380,13 +383,9 @@ $(function() {
 			li_handler($(e.currentTarget).closest("li.hall-listview-li"));
 		})
 		.on("click", "a[data-route]", function(e) {
-			// quick 4x @ 250
-			for(var i=1; i<5; i++) {
-				setTimeout(li_parse_all, i*250);
-			}
-			// jic 4x @ 1K
-			for(var i=1; i<5; i++) {
-				setTimeout(li_parse_all, i*1000);
-			}
+			// reduced to 3 - quick, med, long
+			setTimeout(li_parse_all, 250);
+			setTimeout(li_parse_all, 1000);
+			setTimeout(li_parse_all, 5000);
 		});
 });

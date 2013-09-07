@@ -47,7 +47,7 @@ if test ${#fver} -gt 0; then
 	new_version=$(head -n 1 "$cwd/$fver")
 
 	# bump update_manifest
-	sed_update_manifest="s/version=\".*\\?\"/version=\"$new_version\"/"
+	sed_update_manifest="s/\.crx\" version=\".*\\?\"/\.crx\" version=\"$new_version\"/"
 	(sed -i"" "$sed_update_manifest" "$cwd/update_manifest.xml")
 
 	# bump manifest

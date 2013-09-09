@@ -15,9 +15,9 @@ while [ -h "$bash_source" ]; do
 	# if $bash_source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 	[[ $bash_source != /* ]] && bash_source="$cwd/$bash_source"
 done
-cwd="$(cd -P "$(dirname "$bash_source" )" && pwd )"
+cwd="$(cd -P "$(dirname "$bash_source" )" && pwd)"
 
-
+# args
 if test $# -lt 2; then
 	echo "Usage:"
 	echo "crxmake.sh <extension dir> <pem path> [output.crx]"
@@ -36,7 +36,6 @@ else
 		dest=$3
 		fver=$4
 	fi
-
 fi
 
 # do build versioning

@@ -11,6 +11,7 @@ $(function() {
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
 		re_hr: /\n?[-]{10,}/g,
+		re_vis: /(\b)vis[-]([0-9]+)(\b)/gi,
 		// hashes
 		ols: {},
 		bots: {},
@@ -238,6 +239,13 @@ $(function() {
 			var re_hr = $options.re_hr;
 			if (re_hr.test(msg_html)) {
 				msg_html = msg_html.replace(re_hr, "<hr/>")
+				msg.html(msg_html);
+			}
+
+			// jira bugs
+			var re_vis = $options.re_vis;
+			if (re_vis.test(msg_html)) {
+				msg_html = msg_html.replace(re_vis, '$1<a href="http://bugtracker/browse/VIS-$2" target="_blank">VIS-$2</a>$3');
 				msg.html(msg_html);
 			}
 

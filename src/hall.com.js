@@ -11,7 +11,7 @@ $(function() {
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
 		re_hr: /\n?[-]{10,}/g,
-		re_vis: /([^\B\/"'>])vis[-]([0-9]+)([^\B"'<])/gi,
+		re_vis: /([^\B\/"'>])vis[-]([0-9]+)([^\B"'<]|$)/gi,
 		// hashes
 		ols: {},
 		bots: {},

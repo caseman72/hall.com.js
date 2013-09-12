@@ -8,7 +8,17 @@ span.user {background-color: rgba(123, 123, 123, 0.2); border-radius: 3px;}
 li.git_bot {background-color: rgba(236,168,82,0.08);}
 li.git_bot span.curr { background-color: transparent; }
 li.git_bot span.user { background-color: transparent; }
+pre.msg { overflow: hidden; }
 pre.msg code {font: 13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;}
+li.datetime-header {
+	background: #fefefe;
+	background: -moz-linear-gradient(top, #fefefe 0%, #f9fbfc 50%, #f5f8fa 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fefefe), color-stop(50%,#f9fbfc), color-stop(100%,#f5f8fa));
+	background: -webkit-linear-gradient(top, #fefefe 0%,#f9fbfc 50%,#f5f8fa 100%);
+	background: -o-linear-gradient(top, #fefefe 0%,#f9fbfc 50%,#f5f8fa 100%);
+	background: -ms-linear-gradient(top, #fefefe 0%,#f9fbfc 50%,#f5f8fa 100%);
+	background: linear-gradient(to bottom, #fefefe 0%,#f9fbfc 50%,#f5f8fa 100%);
+}
 /* code highlight */
 .sh_typical {background:none; padding:0; margin:0; border:0 none;}
 .sh_typical .sh_sourceCode {background-color:#f6f6f6; color:#000; font-weight:normal; font-style:normal;}

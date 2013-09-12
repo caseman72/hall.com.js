@@ -8,7 +8,7 @@ span.user {background-color: rgba(123, 123, 123, 0.2); border-radius: 3px;}
 li.git_bot {background-color: rgba(236,168,82,0.08);}
 li.git_bot span.curr { background-color: transparent; }
 li.git_bot span.user { background-color: transparent; }
-pre.msg { overflow: hidden; }
+pre.msg { overflow: hidden !important; }
 pre.msg code {font: 13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;}
 li.datetime-header {
 	background: #fefefe;

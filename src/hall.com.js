@@ -101,36 +101,38 @@ $(function() {
 
 		var $options = $.hall_object;
 		for (var i=0,n=data.length; i<n; i++) {
-			var display_name = ""+data[i].display_name;
+			if ("display_name" in data[i]) {
+				var display_name = ""+data[i].display_name;
 
-			// user name logic
-			var user = data[i].user;
+				// user name logic
+				var user = data[i].user;
 
-			// job title is our flag for bots
-			if (user.job_title == "git-bot") {
-				$options.bots[display_name] = user;
-			}
-			else {
-				if (user.fname && user.lname) {
-					if (user.lname.length < 4) {
-						user = [display_name, user.fname, user.fname+user.lname[0]].join("|");
-					}
-					else {
-						user = [display_name, display_name.replace(/[ ]+/g, "|"), user.fname+user.lname[0]].join("|");
-					}
+				// job title is our flag for bots
+				if (user.job_title == "git-bot") {
+					$options.bots[display_name] = user;
 				}
 				else {
-					user = display_name;
-				}
-
-				// current_user or users
-				if (display_name == current_user) {
-					if (!(display_name in $options.current_user)) {
-						$options.current_user[display_name] = user;
+					if (user.fname && user.lname) {
+						if (user.lname.length < 4) {
+							user = [display_name, user.fname, user.fname+user.lname[0]].join("|");
+						}
+						else {
+							user = [display_name, display_name.replace(/[ ]+/g, "|"), user.fname+user.lname[0]].join("|");
+						}
 					}
-				}
-				else if (!(display_name in $options.current_users)) {
-					$options.current_users[display_name] = user;
+					else {
+						user = display_name;
+					}
+
+					// current_user or users
+					if (display_name == current_user) {
+						if (!(display_name in $options.current_user)) {
+							$options.current_user[display_name] = user;
+						}
+					}
+					else if (!(display_name in $options.current_users)) {
+						$options.current_users[display_name] = user;
+					}
 				}
 			}
 		};

@@ -10,6 +10,7 @@ li.git_bot span.curr { background-color: transparent; }
 li.git_bot span.user { background-color: transparent; }
 pre.msg { overflow: hidden !important; }
 pre.msg code {font: 13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;}
+pre.msg code.fixed-font {font: 12px/18px "Courier New", Courier, monospace;}
 li.datetime-header {
 	background: #fefefe;
 	background: -moz-linear-gradient(top, #fefefe 0%, #f9fbfc 50%, #f5f8fa 100%);

@@ -10,7 +10,8 @@ $(function() {
 		re_source: /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/,
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
-		re_hr: /\n?[-]{10,}/g,
+		re_hr: /\n?[-]{10,}([<\n])/g,
+		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_vis: /(^|[^\B\/"'>])vis[-]([0-9]+)([^\B"'<]|$)/gi,
 		// hashes
 		ols: {},
@@ -237,10 +238,10 @@ $(function() {
 				msg.html(msg_html);
 			}
 
-			// horizontal rule
+			// horizontal rules
 			var re_hr = $options.re_hr;
 			if (re_hr.test(msg_html)) {
-				msg_html = msg_html.replace(re_hr, "<hr/>")
+				msg_html = msg_html.replace(re_hr, "<hr/>$1");
 				msg.html(msg_html);
 			}
 
@@ -269,6 +270,10 @@ $(function() {
 					// phone numbers are 7 digits ~ most a person can remember
 					msg.find("pre."+src).snippet(src, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)});
 				}
+			}
+			else if ($options.re_table.test(msg_html)) {
+				// tables
+				msg.find("code").addClass("fixed-font");
 			}
 
 			// robot message
@@ -382,7 +387,7 @@ $(function() {
 		});
 	};
 
-	// only needs to run on start - watches DOM mutations 
+	// only needs to run on start - watches DOM mutations
 	document_watch();
 
 	/**

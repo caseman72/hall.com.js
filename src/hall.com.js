@@ -36,7 +36,7 @@ $(function() {
 		var found = $(".hr").removeClass("hr b4").length;
 		var hash = "#"+ $li.data("id");
 
-		if (found && window.location.hash == hash) {
+		if (found && window.location.hash === hash) {
 			// click again to clear
 			window.location.hash = "";
 			$li.siblings().removeClass("b4");
@@ -63,7 +63,7 @@ $(function() {
 		// if no keys - not done
 		var all_done = Object.keys($options.rooms).length > 0;
 		for (var id in $options.rooms) {
-			all_done = all_done && $options.rooms[id] == $options.states.done;
+			all_done = all_done && $options.rooms[id] === $options.states.done;
 		}
 
 		return all_done;
@@ -109,7 +109,7 @@ $(function() {
 				var user = data[i].user;
 
 				// job title is our flag for bots
-				if (user.job_title == "git-bot") {
+				if (user.job_title === "git-bot") {
 					$options.bots[display_name] = user;
 				}
 				else {
@@ -126,7 +126,7 @@ $(function() {
 					}
 
 					// current_user or users
-					if (display_name == current_user) {
+					if (display_name === current_user) {
 						if (!(display_name in $options.current_user)) {
 							$options.current_user[display_name] = user;
 						}
@@ -136,7 +136,7 @@ $(function() {
 					}
 				}
 			}
-		};
+		}
 
 		// update room to processed
 		$options.rooms[this.room_id] = $options.states.done;
@@ -166,7 +166,7 @@ $(function() {
 			if (room_id) {
 				$(elem).data("room-id", room_id);
 				if (!(room_id in $options.rooms)) {
-					$options.rooms[room_id] = $options.states.init
+					$options.rooms[room_id] = $options.states.init;
 				}
 			}
 		});
@@ -174,7 +174,7 @@ $(function() {
 		// second loop to 'get' rooms if not-processed
 		rooms.each(function(i, elem) {
 			var room_id = $(elem).data("room-id");
-			if (room_id && (room_id in $options.rooms) && $options.rooms[room_id] == $options.states.init) {
+			if (room_id && (room_id in $options.rooms) && $options.rooms[room_id] === $options.states.init) {
 				$options.rooms[room_id] = $options.states.running;
 				$.ajax({
 					type: "GET",
@@ -190,8 +190,6 @@ $(function() {
 	 * reparse all li's
 	 */
 	var li_parse_all = function() {
-		var $options = $.hall_object;
-
 		if (rooms_done()) {
 			$(".hall-listview-chat").find("li").each(function(i, li) {
 				li_parse_user(li, "li_parse_all");
@@ -210,7 +208,7 @@ $(function() {
 	 * when new li's show up this parses the users in the msg div
 	 *
 	 */
-	var li_parse_user = function(li, location) {
+	var li_parse_user = function(li) {
 		var $options = $.hall_object;
 
 		// this will reparse
@@ -234,7 +232,7 @@ $(function() {
 			// users
 			var re_user = $options.re_user;
 			if (re_user.test(msg_html)) {
-				msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>")
+				msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>");
 				msg.html(msg_html);
 			}
 
@@ -281,7 +279,9 @@ $(function() {
 			if (cite.length) {
 				var cite_text = cite.addClass("gbp").text();
 				for (var name in $options.bots) {
-					cite_text == name && $li.addClass("git_bot");
+					if (name === cite_text) {
+						$li.addClass("git_bot");
+					}
 				}
 			}
 		}
@@ -302,11 +302,11 @@ $(function() {
 			if (wrapper_id && !(wrapper_id in $options.ols)) {
 				$options.ols[wrapper_id] = true;
 
-				var observer = new WebKitMutationObserver(function(mutations, obs) {
+				var observer = new WebKitMutationObserver(function(mutations) {
 					// fired when a mutation occurs - up top
 					for (var i=0,n=mutations.length; i<n; i++) {
 						var mutt = mutations[i];
-						if (mutt.type == "childList" && mutt.addedNodes.length > 0) {
+						if (mutt.type === "childList" && mutt.addedNodes.length > 0) {
 							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
 								li_parse_user(mutt.addedNodes[j], "ol_watch");
 							}
@@ -345,23 +345,26 @@ $(function() {
 			if (_chat && (observer.disconnect(), _nodes.length)) {
 				// do the hash stuff here
 				for (var hash = window.location.hash ? window.location.hash.slice(1) : false, li; hash && (li = _nodes.pop());) {
-					li = $(li), li.data("id") == hash && li_handler(li);
+					li = $(li);
+					if (li.data("id") === hash) {
+						li_handler(li);
+					}
 				}
 				// parse the old fashion way
 				li_parse_all();
 			}
 		};
 
-		var observer = new WebKitMutationObserver(function(mutations, obs) {
+		var observer = new WebKitMutationObserver(function(mutations) {
 			for (var i=0,n=mutations.length; i<n; i++) {
 				var mutt = mutations[i];
-				if (mutt.type == "childList" && mutt.addedNodes.length > 0) {
-					if (mutt.target.nodeName == "OL") {
+				if (mutt.type === "childList" && mutt.addedNodes.length > 0) {
+					if (mutt.target.nodeName === "OL") {
 						if (mutt.target.className.match(/hall-listview-chat/)) {
 							// add all the new messages so we can parse them
 							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
 								var node = mutt.addedNodes[j];
-								if (node.nodeName == "LI") {
+								if (node.nodeName === "LI") {
 									_nodes.push(node);
 								}
 							}
@@ -397,7 +400,7 @@ $(function() {
 		.on("click", "time", function(e) {
 			li_handler($(e.currentTarget).closest("li.hall-listview-li"));
 		})
-		.on("click", "a[data-route]", function(e) {
+		.on("click", "a[data-route]", function(/*e*/) {
 			// reduced to 3 - quick, med, long
 			setTimeout(li_parse_all, 250);
 			setTimeout(li_parse_all, 1000);

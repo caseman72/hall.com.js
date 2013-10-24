@@ -11,6 +11,7 @@ $(function() {
 		re_user: {test: function() { return false; }},
 		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)(?:<\/code>)?/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
+		re_hex: /(^|[^\B\/"'>])(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))([^\B"'<]|$)/g,
 		re_vis: /(^|[^\B\/"'>])vis[-]([0-9]+)([^\B"'<]|$)/gi,
 		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,
 		re_hr: /\n?[-]{10,}([<\n])/g,
@@ -232,7 +233,7 @@ $(function() {
 				if (re_me.test(msg_html)) {
 					var span_class = ($options.re_current.test(cite_text)) ? "curr" : "user";
 					msg_html = msg_html.replace(re_me, '$1<span class="'+ span_class +'">'+ cite_text + "</span>$2");
-					msg.html(msg_html);
+					msg.html(msg_html).addClass("me");
 				}
 				// robot messages
 				else {
@@ -275,8 +276,10 @@ $(function() {
 				else if ($options.re_table.test(msg_html)) {
 					msg.find("code").addClass("fixed-font");
 				}
-				else {
-					console.log(msg_html);
+				// hex not in code
+				else if ($options.re_hex.test(msg_html)) {
+					msg_html = msg_html.replace($options.re_hex, '$1$2 <span class="hex-preview" style="background-color: $2;">&nbsp;</span>$3');
+					msg.html(msg_html);
 				}
 			}
 

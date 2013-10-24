@@ -9,7 +9,7 @@ $(function() {
 		// regexes
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
-		re_source: /^(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)/,
+		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)(?:<\/code>)?/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_vis: /(^|[^\B\/"'>])vis[-]([0-9]+)([^\B"'<]|$)/gi,
 		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,
@@ -265,7 +265,6 @@ $(function() {
 				var source_parts = re_source.exec(msg_html);
 				if (source_parts) {
 					var source_lang = (source_parts[1] == "code" ? "js" : source_parts[1]);
-					console.log(source_lang);
 
 					msg_html = msg_html.replace(re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>");
 					msg.html(msg_html)
@@ -275,6 +274,9 @@ $(function() {
 				// ascii tables
 				else if ($options.re_table.test(msg_html)) {
 					msg.find("code").addClass("fixed-font");
+				}
+				else {
+					console.log(msg_html);
 				}
 			}
 

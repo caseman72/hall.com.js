@@ -7,12 +7,13 @@ $(function() {
 	 */
 	$.hall_object = {
 		// regexes
-		re_source: /(^|html|css|js|php|sql|xml)\{\{([\s\S]+)\}\}\1?/,
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
-		re_hr: /\n?[-]{10,}([<\n])/g,
+		re_source: /^(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_vis: /(^|[^\B\/"'>])vis[-]([0-9]+)([^\B"'<]|$)/gi,
+		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,
+		re_hr: /\n?[-]{10,}([<\n])/g,
 		// hashes
 		ols: {},
 		bots: {},
@@ -220,20 +221,61 @@ $(function() {
 		var $li = $(li);
 		var msg = $li.find(".msg:not(.lip)");
 		if (msg.length) {
+			var git_bot = false;
 			var msg_html = msg.addClass("lip").html();
 
-			// current
-			var re_current = $options.re_current;
-			if (re_current.test(msg_html)) {
-				msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
-				msg.html(msg_html);
+			var cite = $li.find("cite:not(.gbp)");
+			if (cite.length) {
+				var cite_text = cite.addClass("gbp").text();
+				// /me
+				var re_me = $options.re_me;
+				if (re_me.test(msg_html)) {
+					var span_class = ($options.re_current.test(cite_text)) ? "curr" : "user";
+					msg_html = msg_html.replace(re_me, '$1<span class="'+ span_class +'">'+ cite_text + "</span>$2");
+					msg.html(msg_html);
+				}
+				// robot messages
+				else {
+					for (var name in $options.bots) {
+						if (name === cite_text) {
+							$li.addClass("git_bot");
+							git_bot = true;
+						}
+					}
+				}
 			}
 
-			// users
-			var re_user = $options.re_user;
-			if (re_user.test(msg_html)) {
-				msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>");
-				msg.html(msg_html);
+			if (!git_bot) {
+				// current
+				var re_current = $options.re_current;
+				if (re_current.test(msg_html)) {
+					msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
+					msg.html(msg_html);
+				}
+
+				// users
+				var re_user = $options.re_user;
+				if (re_user.test(msg_html)) {
+					msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>");
+					msg.html(msg_html);
+				}
+
+				// source code
+				var re_source = $options.re_source;
+				var source_parts = re_source.exec(msg_html);
+				if (source_parts) {
+					var source_lang = (source_parts[1] == "code" ? "js" : source_parts[1]);
+					console.log(source_lang);
+
+					msg_html = msg_html.replace(re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>");
+					msg.html(msg_html)
+						.find("pre."+source_lang)
+						.snippet(source_lang, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)});
+				}
+				// ascii tables
+				else if ($options.re_table.test(msg_html)) {
+					msg.find("code").addClass("fixed-font");
+				}
 			}
 
 			// horizontal rules
@@ -248,41 +290,6 @@ $(function() {
 			if (re_vis.test(msg_html)) {
 				msg_html = msg_html.replace(re_vis, '$1<a href="http://bugtracker/browse/VIS-$2" target="_blank">VIS-$2</a>$3');
 				msg.html(msg_html);
-			}
-
-			var changed = false;
-			var parts = null;
-			var srcs = {};
-
-			// source code
-			var re_source = $options.re_source;
-			while (parts = re_source.exec(msg_html)) {
-				msg_html = msg_html.replace(re_source, '<pre class="'+ (parts[1] || "js") +'">'+ parts[2] +"</pre>");
-				srcs[(parts[1] || "js")] = true;
-				changed = true;
-			}
-
-			if (changed) {
-				msg.html(msg_html);
-				for (var src in srcs) {
-					// phone numbers are 7 digits ~ most a person can remember
-					msg.find("pre."+src).snippet(src, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)});
-				}
-			}
-			else if ($options.re_table.test(msg_html)) {
-				// tables
-				msg.find("code").addClass("fixed-font");
-			}
-
-			// robot message
-			var cite = $li.find("cite:not(.gbp)");
-			if (cite.length) {
-				var cite_text = cite.addClass("gbp").text();
-				for (var name in $options.bots) {
-					if (name === cite_text) {
-						$li.addClass("git_bot");
-					}
-				}
 			}
 		}
 

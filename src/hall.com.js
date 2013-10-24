@@ -12,7 +12,7 @@ $(function() {
 		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)(?:<\/code>)?/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(^|[^\B\/"'>])(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))([^\B"'<]|$)/g,
-		re_vis: /(^|[^\B\/"'>])vis[-]([0-9]+)([^\B"'<]|$)/gi,
+		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B"'<]|$)/gi,
 		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		// hashes
@@ -291,9 +291,12 @@ $(function() {
 			}
 
 			// jira bugs
-			var re_vis = $options.re_vis;
-			if (re_vis.test(msg_html)) {
-				msg_html = msg_html.replace(re_vis, '$1<a href="http://bugtracker/browse/VIS-$2" target="_blank">VIS-$2</a>$3');
+			var re_bug = $options.re_bug;
+			if (re_bug.test(msg_html)) {
+				msg_html = msg_html.replace(re_bug, function(str, p1, p2, p3, p4) {
+					p2 = p2.toUpperCase();
+					return p1+'<a href="http://bugtracker/browse/'+p2+'-'+p3+'" target="_blank">'+p2+'-'+p3+'</a>'+p4;
+				});
 				msg.html(msg_html);
 			}
 		}

@@ -81,7 +81,7 @@ $(function() {
 		if (-1 !== $.inArray(status, ["available", "here"])) {
 			status = "available";
 		}
-		else if (-1 !== $.inArray(status, ["gone", "brb", "out", "l8r"])) {
+		else if (-1 !== $.inArray(status, ["away", "gone", "brb", "out", "l8r"])) {
 			status = "away";
 		}
 		else if (-1 !== $.inArray(status, ["busy", "dnd"])) {

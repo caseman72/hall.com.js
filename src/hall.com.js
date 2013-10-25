@@ -267,16 +267,10 @@ $(function() {
 			var post_parse = true;
 
 			if (cite.length && !cite.hasClass("gbp")) {
-				var cite_text = cite.addClass("gbp").text();
+				cite.addClass("gbp");
 
-				// <Leader>me
-				if ($options.re_me.test(msg_html)) {
-					msg_html = msg_html.replace($options.re_me, '$1<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span>$2');
-					msg.html(msg_html).addClass("me");
-					post_parse = false;
-				}
 				// <Leader>status
-				else if ($options.re_status.test(msg_html)) {
+				if ($options.re_status.test(msg_html)) {
 					msg_html = msg_html.replace($options.re_status, function(str, p1, p2) {
 						p1 = $.trim(p1), p2 = $.trim(p2);
 						return '<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span> is '+p1+(p2?' says "'+p2+'"':'');
@@ -318,6 +312,7 @@ $(function() {
 					var re_user = $options.re_user;
 					var re_table = $options.re_table;
 					var re_hex = $options.re_hex;
+					var re_me = $options.re_me;
 
 					// current
 					if (re_current.test(msg_html)) {
@@ -325,9 +320,14 @@ $(function() {
 						msg.html(msg_html);
 					}
 					// users
-					else if (re_user.test(msg_html)) {
+					if (re_user.test(msg_html)) {
 						msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>");
 						msg.html(msg_html);
+					}
+					// <Leader>me
+					if (re_me.test(msg_html)) {
+						msg_html = msg_html.replace(re_me, '$1<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span>$2');
+						msg.html(msg_html).addClass("me");
 					}
 
 					// ascii tables

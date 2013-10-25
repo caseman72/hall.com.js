@@ -21,6 +21,7 @@ $(function() {
 		ols: {},
 		bots: {},
 		rooms: {},
+		current_display_name: "",
 		current_user: {},
 		current_users: {},
 		// states
@@ -129,9 +130,9 @@ $(function() {
 		// must be an array ...
 		data = (!data || (typeof data.length !== "number")) ? [] : data;
 
-		var current_user = $(".user-settings:first").find(".current-user").find(".fullname").text();
-
 		var $options = $.hall_object;
+		var current_user = $options.current_display_name = $(".user-settings:first").find(".current-user").find(".fullname").text();
+
 		for (var i=0,n=data.length; i<n; i++) {
 			if ("display_name" in data[i]) {
 				var display_name = ""+data[i].display_name;
@@ -254,7 +255,7 @@ $(function() {
 		var time = $li.find("time");
 		var cite = $li.find("cite");
 		var cite_text = $.trim(cite.text() || "");
-		var curr_user = cite_text.match($options.re_current) ? true : false;
+		var curr_user = cite_text === $options.current_display_name; // TODO: use the user_id
 
 		// fix class names single space trimmed
 		var li_class = ""+li.className;

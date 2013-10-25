@@ -12,10 +12,11 @@ $(function() {
 		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)(?:<\/code>)?/,
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)(?:<\/code>)?/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
-		re_hex: /(^|[^\B\/"'>])(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))([^\B"'<]|$)/g,
+		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
 		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B"'<]|$)/gi,
 		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,
 		re_hr: /\n?[-]{10,}([<\n])/g,
+		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
 		// hashes
 		ols: {},
 		bots: {},
@@ -255,6 +256,12 @@ $(function() {
 		var cite_text = $.trim(cite.text() || "");
 		var curr_user = cite_text.match($options.re_current) ? true : false;
 
+		// fix class names single space trimmed
+		var li_class = ""+li.className;
+		if (li.className.match($options.re_ds)) {
+			li.className = $.trim(li_class.replace($options.re_ds, " "));
+		}
+
 		// <Leader>status
 		if (curr_user && time.hasClass("localtime")) {
 			var status_parts = $options.re_status.exec(msg.html());
@@ -291,20 +298,20 @@ $(function() {
 
 			if (post_parse) {
 				// source code
-				var re_source = $options.re_source;
-				var source_parts = re_source.exec(msg_html);
+				var source_parts = $options.re_source.exec(msg_html);
 				if (source_parts) {
 					var source_lang = (source_parts[1] == "code" ? "js" : source_parts[1]);
 					var line_count = (msg_html.match(/\n/g)||[]).length;
 
-					msg_html = msg_html.replace(re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>");
+					msg_html = msg_html.replace($options.re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>");
 					msg.html(msg_html)
 						.find("pre."+source_lang)
 						.snippet(source_lang, {style:"typical", showNum: (line_count > 7)});
 
 					// add some space
 					if (line_count > 0) {
-						msg.css("padding-right", "50px")
+						// hack to get the boxes to align on the right
+						msg.css("padding-right", ($li.hasClass("nested") ? "50px" : "13px"));
 					}
 				}
 				else {
@@ -336,7 +343,7 @@ $(function() {
 					}
 					// hex not in code
 					else if (re_hex.test(msg_html)) {
-						msg_html = msg_html.replace(re_hex, '$1$2 <span class="hex-preview" style="background-color: $2;">&nbsp;</span>$3');
+						msg_html = msg_html.replace(re_hex, '$1 <span class="hex-preview" style="background-color: $1;">&nbsp;</span>');
 						msg.html(msg_html);
 					}
 				}

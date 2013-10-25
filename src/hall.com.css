@@ -25,7 +25,7 @@ span.hex-preview{ border-radius:3px; text-decoration:none; border:1px solid #999
 .snippet-wrap .snippet-menu pre,.snippet-wrap .snippet-hide pre{margin:0;padding:0;}
 .snippet-wrap .snippet-menu a,.snippet-wrap .snippet-hide a{text-decoration:underline;padding:0 5px;}
 .me, .snippet-wrap pre.sh_sourceCode{line-height:1.5em;overflow:auto;position:relative;border-radius:5px;border:1px dotted #999;font:12px/16px Monaco, Menlo, Consolas, "Courier New", monospace;padding:0;}
-.me {padding: 5px 100px 5px 10px;background:#f6f6f6; margin-right: 20px;}
+.me {padding: 5px 10px 5px 10px;background:#f6f6f6;margin-right:100px;}
 .snippet-wrap .snippet-no-num{list-style:none;margin:0;padding:.5em;}
 .snippet-wrap .snippet-no-num li{list-style:none;margin:0;padding:0;}
 .snippet-wrap .snippet-num{margin:0;padding:.5em .5em .5em 3em;}

@@ -10,6 +10,7 @@ $(function() {
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
 		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)(?:<\/code>)?/,
+		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)(?:<\/code>)?/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(^|[^\B\/"'>])(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))([^\B"'<]|$)/g,
 		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B"'<]|$)/gi,
@@ -46,12 +47,10 @@ $(function() {
 		else if ($li.length) {
 			// click to set
 			window.location.hash = hash;
-			$li.addClass("hr").siblings()
-				.filter(":lt("+ $li.index() +")").addClass("b4")
-					.end()
-				.filter(":gt("+ $li.index() +")").removeClass("b4")
-					.end()
-				.end();
+			$li.addClass("hr")
+				.siblings()
+					.filter(":lt("+ $li.index() +")").addClass("b4").end()
+					.filter(":gt("+ $li.index() +")").removeClass("b4").end();
 		}
 	};
 
@@ -69,6 +68,35 @@ $(function() {
 		}
 
 		return all_done;
+	};
+
+	/**
+	 * update status via ajax - only for time.localtime (right now)
+	 */
+	var update_status = function(status, message) {
+		status = $.trim(status || "available").toLowerCase();
+		message = $.trim(message || "");
+
+		// abbreviations
+		if (-1 !== $.inArray(status, ["available", "here"])) {
+			status = "available";
+		}
+		else if (-1 !== $.inArray(status, ["gone", "brb", "out", "l8r"])) {
+			status = "away";
+		}
+		else if (-1 !== $.inArray(status, ["busy", "dnd"])) {
+			status = "dnd";
+		}
+
+		// update status
+		$.ajax({
+			type: "POST",
+			data: {status: status, message: message},
+			headers: {
+				"X-CSRF-Token": $.trim($("meta[name='csrf-token']").attr("content"))
+			},
+			url: "https://hall.com/api/1/user_statuses"
+		});
 	};
 
 
@@ -182,7 +210,8 @@ $(function() {
 					type: "GET",
 					url: "https://hall.com/api/1/rooms/groups/" +room_id+ "/room_members?_=" + (new Date().getTime()),
 					context: {room_id: room_id} // pass in room_id to be marked as done
-				}).done(parse_user_data);
+				})
+				.done(parse_user_data);
 			}
 		});
 	};
@@ -220,66 +249,96 @@ $(function() {
 		}
 
 		var $li = $(li);
-		var msg = $li.find(".msg:not(.lip)");
-		if (msg.length) {
-			var git_bot = false;
-			var msg_html = msg.addClass("lip").html();
+		var msg = $li.find(".msg");
+		var time = $li.find("time");
+		var cite = $li.find("cite");
+		var cite_text = $.trim(cite.text() || "");
+		var curr_user = cite_text.match($options.re_current) ? true : false;
 
-			var cite = $li.find("cite:not(.gbp)");
-			if (cite.length) {
+		// <Leader>status
+		if (curr_user && time.hasClass("localtime")) {
+			var status_parts = $options.re_status.exec(msg.html());
+			if (status_parts) {
+				update_status(status_parts[1], status_parts[2]);
+			}
+		}
+		else if (msg.length && !msg.hasClass("lip")) {
+			var msg_html = msg.addClass("lip").html();
+			var post_parse = true;
+
+			if (cite.length && !cite.hasClass("gbp")) {
 				var cite_text = cite.addClass("gbp").text();
-				// /me
-				var re_me = $options.re_me;
-				if (re_me.test(msg_html)) {
-					var span_class = ($options.re_current.test(cite_text)) ? "curr" : "user";
-					msg_html = msg_html.replace(re_me, '$1<span class="'+ span_class +'">'+ cite_text + "</span>$2");
+
+				// <Leader>me
+				if ($options.re_me.test(msg_html)) {
+					msg_html = msg_html.replace($options.re_me, '$1<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span>$2');
 					msg.html(msg_html).addClass("me");
+					post_parse = false;
+				}
+				// <Leader>status
+				else if ($options.re_status.test(msg_html)) {
+					msg_html = msg_html.replace($options.re_status, function(str, p1, p2) {
+						p1 = $.trim(p1), p2 = $.trim(p2);
+						return '<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span> is '+p1+(p2?' says "'+p2+'"':'');
+					});
+					msg.html(msg_html).addClass("me");
+					post_parse = false;
 				}
 				// robot messages
 				else {
 					for (var name in $options.bots) {
 						if (name === cite_text) {
 							$li.addClass("git_bot");
-							git_bot = true;
+							post_parse = false;
 						}
 					}
 				}
 			}
 
-			if (!git_bot) {
-				// current
-				var re_current = $options.re_current;
-				if (re_current.test(msg_html)) {
-					msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
-					msg.html(msg_html);
-				}
-
-				// users
-				var re_user = $options.re_user;
-				if (re_user.test(msg_html)) {
-					msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>");
-					msg.html(msg_html);
-				}
-
+			if (post_parse) {
 				// source code
 				var re_source = $options.re_source;
 				var source_parts = re_source.exec(msg_html);
 				if (source_parts) {
 					var source_lang = (source_parts[1] == "code" ? "js" : source_parts[1]);
+					var line_count = (msg_html.match(/\n/g)||[]).length;
 
 					msg_html = msg_html.replace(re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>");
 					msg.html(msg_html)
 						.find("pre."+source_lang)
-						.snippet(source_lang, {style:"typical", showNum: ((msg_html.match(/\n/g)||[]).length > 7)});
+						.snippet(source_lang, {style:"typical", showNum: (line_count > 7)});
+
+					// add some space
+					if (line_count > 0) {
+						msg.css("padding-right", "50px")
+					}
 				}
-				// ascii tables
-				else if ($options.re_table.test(msg_html)) {
-					msg.find("code").addClass("fixed-font");
-				}
-				// hex not in code
-				else if ($options.re_hex.test(msg_html)) {
-					msg_html = msg_html.replace($options.re_hex, '$1$2 <span class="hex-preview" style="background-color: $2;">&nbsp;</span>$3');
-					msg.html(msg_html);
+				else {
+					var re_current = $options.re_current;
+					var re_user = $options.re_user;
+					var re_table = $options.re_table;
+					var re_hex = $options.re_hex;
+
+					// current
+					if (re_current.test(msg_html)) {
+						msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
+						msg.html(msg_html);
+					}
+					// users
+					else if (re_user.test(msg_html)) {
+						msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>");
+						msg.html(msg_html);
+					}
+
+					// ascii tables
+					if (re_table.test(msg_html)) {
+						msg.find("code").addClass("fixed-font");
+					}
+					// hex not in code
+					else if (re_hex.test(msg_html)) {
+						msg_html = msg_html.replace(re_hex, '$1$2 <span class="hex-preview" style="background-color: $2;">&nbsp;</span>$3');
+						msg.html(msg_html);
+					}
 				}
 			}
 
@@ -290,7 +349,7 @@ $(function() {
 				msg.html(msg_html);
 			}
 
-			// jira bugs
+			// bugs
 			var re_bug = $options.re_bug;
 			if (re_bug.test(msg_html)) {
 				msg_html = msg_html.replace(re_bug, function(str, p1, p2, p3, p4) {

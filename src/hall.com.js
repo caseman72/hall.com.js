@@ -259,7 +259,7 @@ $(function() {
 
 		// fix class names single space trimmed
 		var li_class = ""+li.className;
-		if (li.className.match($options.re_ds)) {
+		if (li_class.match($options.re_ds)) {
 			li.className = $.trim(li_class.replace($options.re_ds, " "));
 		}
 

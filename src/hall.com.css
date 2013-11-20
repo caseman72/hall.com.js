@@ -13,6 +13,7 @@ pre.msg code {font: 13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial
 pre.msg code.fixed-font {font: 12px/18px "Courier New", Courier, monospace;}
 li.datetime-header { background:#fefefe; background:linear-gradient(to bottom, #fefefe 0%,#f9fbfc 50%,#f5f8fa 100%); }
 span.hex-preview{ border-radius:3px; text-decoration:none; border:1px solid #999; padding:0 5px; width:16px; }
+.hall-listview-chat li .content { padding: 0 !important; margin-right: 60px !important; }
 
 /* code highlighting */
 .sh_typical{border:0 none;margin:0;padding:0;}
@@ -27,9 +28,9 @@ span.hex-preview{ border-radius:3px; text-decoration:none; border:1px solid #999
 .me, .snippet-wrap pre.sh_sourceCode{line-height:1.5em;overflow:auto;position:relative;border-radius:5px;border:1px dotted #999;font:12px/16px Monaco, Menlo, Consolas, "Courier New", monospace;padding:0;}
 .me {padding: 5px 10px 5px 10px;background:#f6f6f6;margin-right:100px;}
 .snippet-wrap .snippet-no-num{list-style:none;margin:0;padding:.5em;}
-.snippet-wrap .snippet-no-num li{list-style:none;margin:0;padding:0;}
+.snippet-wrap .snippet-no-num li{list-style:none;margin:0;padding:0 !important;}
 .snippet-wrap .snippet-num{margin:0;padding:.5em .5em .5em 3em;}
-.snippet-wrap .snippet-num li{list-style:decimal-leading-zero outside none;margin:0;padding:0;}
+.snippet-wrap .snippet-num li{list-style:decimal-leading-zero outside none;margin:0;padding:0 !important;}
 .sh_typical .sh_sourceCode .sh_keyword,.sh_typical .sh_sourceCode .sh_date,.sh_typical .sh_sourceCode .sh_time,.sh_typical .sh_sourceCode .sh_file,.sh_typical .sh_sourceCode .sh_difflines,.sh_typical .sh_sourceCode .sh_property{color:#00c;font-weight:700;font-style:normal;}
 .sh_typical .sh_sourceCode .sh_string,.sh_typical .sh_sourceCode .sh_regexp,.sh_typical .sh_sourceCode .sh_symbol,.sh_typical .sh_sourceCode .sh_cbracket,.sh_typical .sh_sourceCode .sh_url,.sh_typical .sh_sourceCode .sh_ip,.sh_typical .sh_sourceCode .sh_name,.sh_typical .sh_sourceCode .sh_newfile,.sh_typical .sh_sourceCode .sh_value{color:#c00;font-weight:400;font-style:normal;}
 .sh_typical .sh_sourceCode .sh_specialchar,.sh_typical .sh_sourceCode .sh_oldfile{color:#C42DA8;font-weight:400;font-style:normal;}

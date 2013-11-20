@@ -13,8 +13,8 @@ $(function() {
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)(?:<\/code>)?/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
-		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B"'<]|$)/gi,
-		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,
+		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B"'<]|$)/gi,  // '
+		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,                      // '{
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
 		// hashes
@@ -299,12 +299,12 @@ $(function() {
 
 			if (post_parse) {
 				// source code
-				var source_parts = $options.re_source.exec(msg_html);
+				var source_parts = $options.re_source.exec(msg_html.replace(/\$/g, "{__%24__}"));
 				if (source_parts) {
 					var source_lang = (source_parts[1] == "code" ? "js" : source_parts[1]);
 					var line_count = (msg_html.match(/\n/g)||[]).length;
 
-					msg_html = msg_html.replace($options.re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>");
+					msg_html = msg_html.replace($options.re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>").replace(/\{__%24__\}/g, "$");
 					msg.html(msg_html)
 						.find("pre."+source_lang)
 						.snippet(source_lang, {style:"typical", showNum: (line_count > 7)});
@@ -314,6 +314,7 @@ $(function() {
 						// hack to get the boxes to align on the right
 						msg.css("padding-right", ($li.hasClass("nested") ? "50px" : "13px"));
 					}
+
 				}
 				else {
 					var re_current = $options.re_current;

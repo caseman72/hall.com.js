@@ -75,9 +75,9 @@ span.hex-preview {
 	margin-right:60px!important;
 }
 
-/* removes duplciate padding on left side of code block */
-.hall-listview-chat li.source-code .content {
-	padding-left: 0;
+/* removes duplciate padding on left side of code block & git commit */
+.hall-listview-chat li.source-code .content, .git_bot pre {
+	padding-left: 0 !important;
 }
 
 /* removes extra padding on right side of code block & git commit */

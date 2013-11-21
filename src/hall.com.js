@@ -13,8 +13,8 @@ $(function() {
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)(?:<\/code>)?/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
-		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B"'<]|$)/gi,  // '
-		re_me: /(^|[^\B\/"'>])\/me([^\B"'<]|$)/g,                      // '{
+		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B'"<]|$)/gi,
+		re_me: /(^|[^\B\/"'>])\/me([^\B'"<]|$)/g,
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
 		// hashes
@@ -71,6 +71,7 @@ $(function() {
 
 		return all_done;
 	};
+
 
 	/**
 	 * update status via ajax - only for time.localtime (right now)
@@ -193,7 +194,7 @@ $(function() {
 		var rooms = $(".rooms:first").find("a[data-route^='rooms']");
 
 		// init loop to define all rooms as not-processed
-		rooms.each(function(i, elem) {
+		rooms.each(function(i_not_used, elem) {
 			var room_id = ($(elem).data("route") || "").replace(/^rooms\/([^\/]+)\/?.*$/, "$1");
 			if (room_id) {
 				$(elem).data("room-id", room_id);
@@ -204,7 +205,7 @@ $(function() {
 		});
 
 		// second loop to 'get' rooms if not-processed
-		rooms.each(function(i, elem) {
+		rooms.each(function(i_not_used, elem) {
 			var room_id = $(elem).data("room-id");
 			if (room_id && (room_id in $options.rooms) && $options.rooms[room_id] === $options.states.init) {
 				$options.rooms[room_id] = $options.states.running;
@@ -224,12 +225,9 @@ $(function() {
 	 */
 	var li_parse_all = function() {
 		if (rooms_done()) {
-			$(".hall-listview-chat").find("li").each(function(i, li) {
-				li_parse_user(li, "li_parse_all");
+			$(".hall-listview-chat").find("li").each(function(i_not_used, li) {
+				li_parse(li);
 			});
-
-			// watch the chat messages for new ones (or old ones)
-			ol_watch();
 		}
 		else {
 			parse_room_links();
@@ -241,27 +239,29 @@ $(function() {
 	 * when new li's show up this parses the users in the msg div
 	 *
 	 */
-	var li_parse_user = function(li) {
-		var $options = $.hall_object;
+	var li_parse = function(li) {
+		var $li = $(li);
 
-		// this will reparse
+		// already parsed
+		if ($li.hasClass("lip")) {
+			return false;
+		}
+		// this happens at the start - sucks to keep checking
 		if (!rooms_done()) {
 			parse_room_links();
 			return false;
 		}
 
-		var $li = $(li);
+		// meat of the code
+		var $options = $.hall_object;
 		var msg = $li.find(".msg");
 		var time = $li.find("time");
 		var cite = $li.find("cite");
 		var cite_text = $.trim(cite.text() || "");
 		var curr_user = cite_text === $options.current_display_name; // TODO: use the user_id
 
-		// fix class names single space trimmed
-		var li_class = ""+li.className;
-		if (li_class.match($options.re_ds)) {
-			li.className = $.trim(li_class.replace($options.re_ds, " "));
-		}
+		// fix class names single space trimmed and add lip - this will force a redraw - boo
+		li.className = $.trim((""+li.className).replace($options.re_ds, " ")) + " lip";
 
 		// <Leader>status
 		if (curr_user && time.hasClass("localtime")) {
@@ -270,41 +270,42 @@ $(function() {
 				update_status(status_parts[1], status_parts[2]);
 			}
 		}
-		else if (msg.length && !msg.hasClass("lip")) {
-			var msg_html = msg.addClass("lip").html();
-			var post_parse = true;
+		else if (msg.length) {
+			var msg_html = msg.html();
 
 			if (cite.length && !cite.hasClass("gbp")) {
 				cite.addClass("gbp");
 
 				// <Leader>status
 				if ($options.re_status.test(msg_html)) {
-					msg_html = msg_html.replace($options.re_status, function(str, p1, p2) {
+					msg_html = msg_html.replace($options.re_status, function(str_not_used, p1, p2) {
 						p1 = $.trim(p1), p2 = $.trim(p2);
 						return '<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span> is '+p1+(p2?' says "'+p2+'"':'');
 					});
-					msg.html(msg_html).addClass("me");
-					post_parse = false;
+					msg.html(msg_html);
+					$li.addClass("me");
 				}
 				// robot messages
 				else {
 					for (var name in $options.bots) {
 						if (name === cite_text) {
 							$li.addClass("git_bot");
-							post_parse = false;
+							break;
 						}
 					}
 				}
 			}
 
-			if (post_parse) {
+			if (!$li.hasClass("me") && !$li.hasClass("git_bot")) {
 				// source code
 				var source_parts = $options.re_source.exec(msg_html.replace(/\$/g, "{__%24__}"));
 				if (source_parts) {
 					var source_lang = (source_parts[1] == "code" ? "js" : source_parts[1]);
 					var line_count = (msg_html.match(/\n/g)||[]).length;
 
-					msg_html = msg_html.replace($options.re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>").replace(/\{__%24__\}/g, "$");
+					msg_html = msg_html
+						.replace($options.re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>")
+						.replace(/\{__%24__\}/g, "$");
 					msg.html(msg_html)
 						.find("pre."+source_lang)
 						.snippet(source_lang, {style:"typical", showNum: (line_count > 7)});
@@ -361,7 +362,7 @@ $(function() {
 			// bugs
 			var re_bug = $options.re_bug;
 			if (re_bug.test(msg_html)) {
-				msg_html = msg_html.replace(re_bug, function(str, p1, p2, p3, p4) {
+				msg_html = msg_html.replace(re_bug, function(str_not_used, p1, p2, p3, p4) {
 					p2 = p2.toUpperCase();
 					return p1+'<a href="http://bugtracker/browse/'+p2+'-'+p3+'" target="_blank">'+p2+'-'+p3+'</a>'+p4;
 				});
@@ -373,120 +374,41 @@ $(function() {
 	};
 
 
-	/**
-	 * DOM watcher listening for new LI's ~ allways on
-	 */
-	var ol_watch = function() {
-		var $options = $.hall_object;
+	// https://github.com/naugtur/insertionQuery
+	var anime_watch = function(selector, callback) {
+		var guid = selector.replace(/[^a-zA-Z0-9]+/g, "_") +"_"+ ((new Date()).getTime());
 
-		$(".hall-listview-viewport").each(function(i, viewport) {
-			// find all viewports and watch them for more messages
-			var wrapper_id = $(viewport).parents(".app-page").attr("id");
-			if (wrapper_id && !(wrapper_id in $options.ols)) {
-				$options.ols[wrapper_id] = true;
+		$("<style/>").html([
+			"@-webkit-keyframes {guid} { from { clip: rect(auto, auto, auto, auto); } to { clip: rect(auto, auto, auto, auto); } }",
+			"@keyframes {guid} { from { clip: rect(auto, auto, auto, auto); } to { clip: rect(auto, auto, auto, auto); } }",
+			"{selector} { animation-duration: 0.001s; animation-name: {guid}; -webkit-animation-duration: 0.001s; -webkit-animation-name: {guid}; }"
+		].join("\n").replace(/\{guid\}/g, guid).replace(/\{selector\}/g, selector)).appendTo("head");
 
-				var observer = new WebKitMutationObserver(function(mutations) {
-					// fired when a mutation occurs - up top
-					for (var i=0,n=mutations.length; i<n; i++) {
-						var mutt = mutations[i];
-						if (mutt.type === "childList" && mutt.addedNodes.length > 0) {
-							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
-								li_parse_user(mutt.addedNodes[j], "ol_watch");
-							}
-						}
-					}
-				});
-
-				// define what element should be observed by the observer
-				// and what types of mutations trigger the callback
-				observer.observe(viewport.childNodes[0], {
-					subtree: false,
-					childList: true,
-					attributes: false,
-					characterData: false,
-					attributeOldValue: false,
-					characterDataOldValue: false
-					//...
-				});
+		var eventHandler = function(event) {
+			if (event.animationName === guid || event.WebkitAnimationName === guid) {
+				callback.call(event.target, event.target);
 			}
-		});
+		}
+
+		// do it now - document ready should be ok - or [setTimeout, 0]
+		document.addEventListener("animationstart", eventHandler, false);
+		document.addEventListener("webkitAnimationStart", eventHandler, false);
 	};
 
+	// watches the animation event and parses li if they animiate
+	anime_watch("li.hall-listview-li", function(li) {
+		li_parse(li);
+	});
 
-	/**
-	 * At startup we need to find the LI's so we can parse them
-	 * Also we can find the Members and add them to the jQuery scope
-	 *
-	 * This one we turn off as soon as the chat/memebers are loaded
-	 */
-	var document_watch = function() {
-		var _chat = false;
-		var _nodes = [];
 
-		// used jsmin to minimize this method ... too many if / if / if
-		var _disconnect = function(observer) {
-			if (_chat && (observer.disconnect(), _nodes.length)) {
-				// do the hash stuff here
-				for (var hash = window.location.hash ? window.location.hash.slice(1) : false, li; hash && (li = _nodes.pop());) {
-					li = $(li);
-					if (li.data("id") === hash) {
-						li_handler(li);
-					}
-				}
-				// parse the old fashion way
-				li_parse_all();
-			}
-		};
+	// jic - nothing shows up start the show
+	setTimeout(parse_room_links, 250);
 
-		var observer = new WebKitMutationObserver(function(mutations) {
-			for (var i=0,n=mutations.length; i<n; i++) {
-				var mutt = mutations[i];
-				if (mutt.type === "childList" && mutt.addedNodes.length > 0) {
-					if (mutt.target.nodeName === "OL") {
-						if (mutt.target.className.match(/hall-listview-chat/)) {
-							// add all the new messages so we can parse them
-							for (var j=0,m=mutt.addedNodes.length; j<m; j++) {
-								var node = mutt.addedNodes[j];
-								if (node.nodeName === "LI") {
-									_nodes.push(node);
-								}
-							}
-
-							// this needs to go last otherwise _nodes.length == 0
-							_chat = true;
-							_disconnect(observer);
-						}
-					}
-				}
-			}
-			_disconnect(observer);
-		});
-
-		observer.observe(document, {
-			subtree: true,
-			childList: true,
-			attributes: false,
-			characterData: false,
-			attributeOldValue: false,
-			characterDataOldValue: false
-			//...
-		});
-	};
-
-	// only needs to run on start - watches DOM mutations
-	document_watch();
 
 	/**
 	 * document click events ...
 	 */
-	$(document)
-		.on("click", "time", function(e) {
-			li_handler($(e.currentTarget).closest("li.hall-listview-li"));
-		})
-		.on("click", "a[data-route]", function(/*e*/) {
-			// reduced to 3 - quick, med, long
-			setTimeout(li_parse_all, 250);
-			setTimeout(li_parse_all, 1000);
-			setTimeout(li_parse_all, 5000);
-		});
+	$(document).on("click", "time", function(e) {
+		li_handler($(e.currentTarget).closest("li.hall-listview-li"));
+	});
 });

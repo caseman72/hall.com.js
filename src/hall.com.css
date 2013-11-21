@@ -86,7 +86,7 @@ span.hex-preview {
 }
 
 /* /me content */
-.hall-listview-chat li .me.content {
+.hall-listview-chat li.me .content {
 	line-height:1.5em;
 	overflow:auto;
 	position:relative;

@@ -338,7 +338,8 @@ $(function() {
 					// <Leader>me
 					if (re_me.test(msg_html)) {
 						msg_html = msg_html.replace(re_me, '$1<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span>$2');
-						msg.html(msg_html).addClass("me");
+						msg.html(msg_html);
+						$li.addClass("me");
 					}
 
 					// ascii tables

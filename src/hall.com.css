@@ -101,7 +101,7 @@ span.hex-preview {
 }
 
 /* restyles current user name for /me */
-.me span.curr, .me span.user {
+.me span.user {
 	background-color: transparent;
 	color: #999;
 }

@@ -80,8 +80,8 @@ span.hex-preview {
 	padding-left: 0;
 }
 
-/* removes extra padding on right side of code block */
-.source-code pre {
+/* removes extra padding on right side of code block & git commit */
+.source-code pre, .git_bot pre {
 	padding-right: 0 !important;
 }
 
@@ -184,6 +184,7 @@ span.hex-preview {
 }
 
 .snippet-wrap .snippet-num {
+	color: #999;
 	margin:0;
 	padding:.5em .5em .5em 3em;
 }

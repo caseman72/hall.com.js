@@ -56,6 +56,10 @@ $(function() {
 		}
 	};
 
+	$(document).on("click", "time", function(e) {
+		li_handler($(e.currentTarget).closest("li.hall-listview-li"));
+	});
+
 
 	/**
 	 * check to see if all rooms are processed
@@ -386,6 +390,7 @@ $(function() {
 			"{selector} { animation-duration: 0.001s; animation-name: {guid}; -webkit-animation-duration: 0.001s; -webkit-animation-name: {guid}; }"
 		].join("\n").replace(/\{guid\}/g, guid).replace(/\{selector\}/g, selector)).appendTo("head");
 
+
 		var eventHandler = function(event) {
 			if (event.animationName === guid || event.WebkitAnimationName === guid) {
 				callback.call(event.target, event.target);
@@ -397,20 +402,24 @@ $(function() {
 		document.addEventListener("webkitAnimationStart", eventHandler, false);
 	};
 
-	// watches the animation event and parses li if they animiate
+	// watches the animation event and parses li if they are inserted
 	anime_watch("li.hall-listview-li", function(li) {
 		li_parse(li);
 	});
 
 
-	// jic - nothing shows up start the show
+	// start the show
 	setTimeout(parse_room_links, 250);
 
 
-	/**
-	 * document click events ...
-	 */
-	$(document).on("click", "time", function(e) {
-		li_handler($(e.currentTarget).closest("li.hall-listview-li"));
-	});
+	// idle timeout to something more than 90s
+	setTimeout(function() {
+		var script = document.createElement("script");
+		script.innerHTML = [
+			'if (window.CL && CL.IdleTimer && CL.IdleTimer.prototype) {',
+			'  CL.IdleTimer.prototype.timeBeforeIdle = 3E7;', // 8.3333 hours
+			'}'
+		].join("\n");
+		document.getElementsByTagName("body")[0].appendChild(script);
+	}, 1000);
 });

@@ -1,78 +1,81 @@
 /* not used for firefox */
-textarea:-moz-placeholder {
-	color:#ADB6BF!important;
+textarea: -moz-placeholder {
+	color: #ADB6BF!important;
 }
 
 /* not used - replace mistakes */
 li.sed {
-	display:none;
+	display: none;
 }
 
 /* not used - horizontal lines */
 li.hr {
-	border-bottom:2px solid #999;
-	opacity:0.2;
+	border-bottom: 2px solid #999;
+	opacity: 0.2;
 }
 
 /* when you click on a time it will keep your spot by putting b4's on the LI's */
 li.b4 {
-	opacity:0.2;
+	opacity: 0.2;
 }
 
 /* current user's background color */
 li.current_user {
-	background-color:rgba(82,168,236,0.08);
+	/* background-color: rgb(234, 241, 251); */
+	background-color: rgba(82,168,236,0.08);
 }
 
 /* current user in text */
 span.curr {
-	background-color:rgba(255,31,63,1);
-	border-radius:3px;
+	background-color: rgba(255,31,63,1);
+	border-radius: 3px;
 	color: #FFF;
 	padding: 2px 4px;
 }
 
 /* any user in text */
 span.user {
-	background-color:rgba(123,123,123,0.2);
-	border-radius:3px;
+	background-color: rgba(123,123,123,0.2);
+	border-radius: 3px;
 }
 
 /* git bot messages */
 .hall-listview-chat li.git_bot {
-	background-color:rgba(236,168,82,0.08);
+	background-color: rgba(236,168,82,0.08);
 }
 
 /* sytle of the multiline content */
 pre.msg {
-	overflow:hidden!important;
+	overflow: hidden!important;
 }
 
 pre.msg code {
-	font:13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;
+	font: 13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 pre.msg code.fixed-font {
-	font:12px/18px "Courier New", Courier, monospace;
+	font: 12px/18px "Courier New", Courier, monospace;
 }
 
 /* day breaks - matches some other gradient */
-li.datetime-header {
-	background:linear-gradient(tobottom,#fefefe0%,#f9fbfc50%,#f5f8fa100%);
+/* li.datetime-header { background: linear-gradient(to bottom,#fefefe 0%,#f9fbfc 50%,#f5f8fa 100%); } */
+div ol.hall-listview-chat li.datetime-header {
+	background-color: #fefefe;
+	background-image: linear-gradient(to bottom, #fefefe 0%,#f9fbfc 50%,#f5f8fa 100%);
 }
 
 /* #FAO in text - the box - the color is added with style */
 span.hex-preview {
-	border-radius:3px;
-	text-decoration:none;
-	border:1px solid #999;
-	width:16px;
-	padding:0 5px;
+	border-radius: 3px;
+	text-decoration: none;
+	border: 1px solid #999;
+	width: 16px;
+	padding: 0 5px;
 }
 
 /* lastest hall css blocks some of the original so I had to add important */
 .hall-listview-chat li .content {
-	margin-right:60px!important;
+	margin-right: 60px!important;
 }
 
 /* removes duplciate padding on left side of code block & git commit */
@@ -87,138 +90,138 @@ span.hex-preview {
 
 /* /me content */
 .hall-listview-chat li.me .content {
-	line-height:1.5em;
-	overflow:auto;
-	position:relative;
+	line-height: 1.5em;
+	overflow: auto;
+	position: relative;
 	background: rgb(246, 246, 246);
-	border-radius:5px;
-	border:1px solid #DDD;
-	color: #999;
-	font:12px/16px Monaco, Menlo, Consolas, "Courier New", monospace;
+	border-radius: 5px;
+	border: 1px solid #DDD;
+	color: #777;
+	font: 12px/16px Monaco, Menlo, Consolas, "Courier New", monospace;
 	font-style: italic;
-	margin-right:60px!important;
-	padding:5px 10px!important;
+	margin-right: 60px!important;
+	padding: 5px 10px!important;
 }
 
 /* restyles current user name for /me */
 .me span.user {
 	background-color: transparent;
-	color: #999;
+	color: #777;
 }
 
 
 /* this is the style from the code highlighter */
 .sh_typical {
-	border:0 none;
-	margin:0;
-	padding:0;
+	border: 0 none;
+	margin: 0;
+	padding: 0;
 }
 
 .sh_typical .sh_sourceCode {
-	color:#000;
-	font-weight:400;
-	font-style:normal;
-	background:#f6f6f6;
+	color: #000;
+	font-weight: 400;
+	font-style: normal;
+	background: #f6f6f6;
 }
 
 .sh_typical .sh_sourceCode .sh_type {
-	color:#00c;
-	font-weight:400;
-	font-style:normal;
+	color: #00c;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .sh_typical .sh_sourceCode .sh_comment {
-	color:#0c0;
-	font-weight:400;
-	font-style:italic;
+	color: #0c0;
+	font-weight: 400;
+	font-style: italic;
 }
 
 .sh_typical .sh_sourceCode .sh_number {
-	color:#a900a9;
-	font-weight:400;
-	font-style:normal;
+	color: #a900a9;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .sh_typical .sh_sourceCode .sh_preproc {
-	color:#666;
-	font-weight:400;
-	font-style:normal;
+	color: #666;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .sh_typical .sh_sourceCode .sh_function {
-	color:#000;
-	font-weight:700;
-	font-style:normal;
+	color: #000;
+	font-weight: 700;
+	font-style: normal;
 }
 
 .snippet-wrap .snippet-menu pre,.snippet-wrap .snippet-hide pre {
-	margin:0;
-	padding:0;
+	margin: 0;
+	padding: 0;
 }
 
 .snippet-wrap .snippet-menu a,.snippet-wrap .snippet-hide a {
-	text-decoration:underline;
-	padding:0 5px;
+	text-decoration: underline;
+	padding: 0 5px;
 }
 
 .snippet-wrap pre.sh_sourceCode {
-	line-height:1.5em;
-	overflow:auto;
-	position:relative;
-	border-radius:5px;
-	border:1px dotted #999;
-	font:12px/16px Monaco, Menlo, Consolas, "Courier New", monospace;
-	padding:0;
+	line-height: 1.5em;
+	overflow: auto;
+	position: relative;
+	border-radius: 5px;
+	border: 1px dotted #999;
+	font: 12px/16px Monaco, Menlo, Consolas, "Courier New", monospace;
+	padding: 0;
 }
 
 .snippet-wrap .snippet-no-num {
-	list-style:none;
-	margin:0;
-	padding:.5em;
+	list-style: none;
+	margin: 0;
+	padding: .5em;
 }
 
 .snippet-wrap .snippet-no-num li {
-	list-style:none;
-	margin:0;
-	padding:0!important;
+	list-style: none;
+	margin: 0;
+	padding: 0!important;
 }
 
 .snippet-wrap .snippet-num {
 	color: #999;
-	margin:0;
-	padding:.5em .5em .5em 3em;
+	margin: 0;
+	padding: .5em .5em .5em 3em;
 }
 
 .snippet-wrap .snippet-num li {
-	list-style:decimal-leading-zero outside none;
-	margin:0;
-	padding:0!important;
+	list-style: decimal-leading-zero outside none;
+	margin: 0;
+	padding: 0!important;
 }
 
 .sh_typical .sh_sourceCode .sh_keyword,.sh_typical .sh_sourceCode .sh_date,.sh_typical .sh_sourceCode .sh_time,.sh_typical .sh_sourceCode .sh_file,.sh_typical .sh_sourceCode .sh_difflines,.sh_typical .sh_sourceCode .sh_property {
-	color:#00c;
-	font-weight:700;
-	font-style:normal;
+	color: #00c;
+	font-weight: 700;
+	font-style: normal;
 }
 
 .sh_typical .sh_sourceCode .sh_string,.sh_typical .sh_sourceCode .sh_regexp,.sh_typical .sh_sourceCode .sh_symbol,.sh_typical .sh_sourceCode .sh_cbracket,.sh_typical .sh_sourceCode .sh_url,.sh_typical .sh_sourceCode .sh_ip,.sh_typical .sh_sourceCode .sh_name,.sh_typical .sh_sourceCode .sh_newfile,.sh_typical .sh_sourceCode .sh_value {
-	color:#c00;
-	font-weight:400;
-	font-style:normal;
+	color: #c00;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .sh_typical .sh_sourceCode .sh_specialchar,.sh_typical .sh_sourceCode .sh_oldfile {
-	color:#C42DA8;
-	font-weight:400;
-	font-style:normal;
+	color: #C42DA8;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .sh_typical .sh_sourceCode .sh_variable,.sh_typical .sh_sourceCode .sh_selector {
-	color:#ec7f15;
-	font-weight:400;
-	font-style:normal;
+	color: #ec7f15;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .hall-listview-chat li.git_bot span.curr,.hall-listview-chat li.git_bot span.user {
-	background-color:transparent;
+	background-color: transparent;
 }

@@ -1,6 +1,6 @@
 /* not used for firefox */
 textarea: -moz-placeholder {
-	color: #ADB6BF!important;
+	color: #ADB6BF !important;
 }
 
 /* not used - replace mistakes */
@@ -46,7 +46,7 @@ span.user {
 
 /* sytle of the multiline content */
 pre.msg {
-	overflow: hidden!important;
+	overflow: hidden !important;
 }
 
 pre.msg code {
@@ -75,15 +75,15 @@ span.hex-preview {
 
 /* lastest hall css blocks some of the original so I had to add important */
 .hall-listview-chat li .content {
-	margin-right: 60px!important;
+	margin-right: 60px !important;
 }
 
 /* removes duplciate padding on left+right side of nested, code block & git commit */
 .hall-listview-chat li.source_code .content,
-.hall-listview-chat li.nested .content,
+.hall-listview-chat li.nested pre.content,
 .hall-listview-chat li.git_bot .content {
-	padding-left: 0 !important;
-	padding-right: 0 !important;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 /* /me content */

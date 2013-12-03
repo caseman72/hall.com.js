@@ -78,13 +78,11 @@ span.hex-preview {
 	margin-right: 60px!important;
 }
 
-/* removes duplciate padding on left side of code block & git commit */
-.hall-listview-chat li.source-code .content, .git_bot pre {
+/* removes duplciate padding on left+right side of nested, code block & git commit */
+.hall-listview-chat li.source_code .content,
+.hall-listview-chat li.nested .content,
+.hall-listview-chat li.git_bot .content {
 	padding-left: 0 !important;
-}
-
-/* removes extra padding on right side of code block & git commit */
-.source-code pre, .git_bot pre {
 	padding-right: 0 !important;
 }
 

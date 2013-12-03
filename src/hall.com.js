@@ -320,7 +320,7 @@ $(function() {
 						msg.css("padding-right", ($li.hasClass("nested") ? "50px" : "13px"));
 					}
 
-					$li.addClass("source-code");
+					$li.addClass("source_code");
 				}
 				else {
 					var re_current = $options.re_current;

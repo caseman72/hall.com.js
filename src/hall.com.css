@@ -20,9 +20,13 @@ li.b4 {
 /* current user's background color */
 
 li.current_user {
-	/* background-color: rgb(234, 241, 251); */
-
 	background-color: rgba(82, 168, 236, 0.08);
+}
+li.standup {
+	background-color: rgba(0, 0, 0, 0.04);
+}
+li.current_user.standup {
+	background-color: rgba(82, 168, 236, 0.14);
 }
 
 /* current user in text */

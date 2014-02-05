@@ -11,6 +11,7 @@ $(function() {
 		re_user: {test: function() { return false; }},
 		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)/,
 		re_marked: /^(?:<code>)?(?:\/(marked|md|quote))([\s\S]+)/,
+		re_standup: /^(?:<code>)?(Today:\n[\s\S]+[-]{10,}[\s\S]+)/,
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
@@ -18,7 +19,7 @@ $(function() {
 		re_me: /(^|[^\B\/"'\S>])\/me([^\B'"<]|$)/g,
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
-		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,
+		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,    //' " {
 		// hashes
 		ols: {},
 		bots: {},
@@ -325,18 +326,45 @@ $(function() {
 					$li.addClass("source_code");
 				}
 
-//				// marked up
-//				var md_parts = $options.re_marked.exec(msg_html.replace(/\$/g, "{__%24__}"));
-//				if (md_parts) {
-//
-//					msg_html = msg_html
-//						.replace($options.re_marked, marked(md_parts[2].replace(/<\/code>/g, "")))
-//						.replace(/\{__%24__\}/g, "$");
-//
-//					msg.html(msg_html).addClass("markdown-body");
-//
-//					$li.addClass("marked");
-//				}
+				// marked up
+				var md_parts = $options.re_marked.exec(msg_html.replace(/\$/g, "{__%24__}"));
+				if (md_parts) {
+
+					var md = md_parts[2].
+						replace(/<\/code>/g, "").
+						replace(/\n[*][*] /g, "\n    * ").
+						replace(/\n[#] /g, "\n1. ").
+						replace(/\n[#][#] /g, "\n    1. ").
+						replace(/(^|\n)([A-Z][^\n]*)/g, "$1##### $2");
+
+					msg_html = msg_html
+						.replace($options.re_marked, marked(md))
+						.replace(/\{__%24__\}/g, "$");
+
+					msg.html(msg_html).addClass("markdown-body");
+
+					$li.addClass("marked");
+				}
+
+				// standup up
+				var sd_parts = $options.re_standup.exec(msg_html.replace(/\$/g, "{__%24__}"));
+				if (sd_parts) {
+
+					var md = sd_parts[1].
+						replace(/<\/code>/g, "").
+						replace(/\n[*][*] /g, "\n    * ").
+						replace(/\n[#] /g, "\n1. ").
+						replace(/\n[#][#] /g, "\n    1. ").
+						replace(/(^|\n)([A-Z][^\n]*)/g, "$1##### $2");
+
+					msg_html = msg_html
+						.replace($options.re_standup, marked(md))
+						.replace(/\{__%24__\}/g, "$");
+
+					msg.html(msg_html).addClass("markdown-body");
+
+					$li.addClass("marked standup");
+				}
 
 				if (!$li.hasClass("source_code")) {
 					var re_current = $options.re_current;

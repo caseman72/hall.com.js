@@ -1,4 +1,4 @@
-/* not used for firefox */
+/* not used, for firefox */
 textarea: -moz-placeholder {
 	color: #ADB6BF !important;
 }
@@ -51,6 +51,7 @@ pre.msg {
 
 pre.msg code {
 	font: 13px/20px "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;
+	display: inline-block;
 }
 
 pre.msg code.fixed-font {
@@ -81,7 +82,8 @@ span.hex-preview {
 /* removes duplciate padding on left+right side of nested, code block & git commit */
 .hall-listview-chat li.source_code .content,
 .hall-listview-chat li.nested pre.content,
-.hall-listview-chat li.git_bot .content {
+.hall-listview-chat li.git_bot .content,
+.hall-listview-chat li pre.content {
 	padding-left: 0;
 	padding-right: 0;
 }

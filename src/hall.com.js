@@ -9,14 +9,16 @@ $(function() {
 		// regexes
 		re_current: {test: function() { return false; }},
 		re_user: {test: function() { return false; }},
-		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)(?:<\/code>)?/,
-		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)(?:<\/code>)?/,
+		re_source: /^(?:<code>)?(?:\/(code|html|css|js|php|sql|xml))([\s\S]+)/,
+		re_marked: /^(?:<code>)?(?:\/(marked|md|quote))([\s\S]+)/,
+		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
 		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B'"<]|$)/gi,
-		re_me: /(^|[^\B\/"'>])\/me([^\B'"<]|$)/g,
+		re_me: /(^|[^\B\/"'\S>])\/me([^\B'"<]|$)/g,
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
+		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,
 		// hashes
 		ols: {},
 		bots: {},
@@ -271,7 +273,7 @@ $(function() {
 		if (curr_user && time.hasClass("localtime")) {
 			var status_parts = $options.re_status.exec(msg.html());
 			if (status_parts) {
-				update_status(status_parts[1], status_parts[2]);
+				update_status(status_parts[1], status_parts[2].replace(/<\/code>/g, ""));
 			}
 		}
 		else if (msg.length) {
@@ -308,7 +310,7 @@ $(function() {
 					var line_count = (msg_html.match(/\n/g)||[]).length;
 
 					msg_html = msg_html
-						.replace($options.re_source, '<pre class="'+ source_lang +'">'+ source_parts[2] +"</pre>")
+						.replace($options.re_source, '<pre class="'+ source_lang +'">'+ source_parts[2].replace(/<\/code>/g, "")+"</pre>")
 						.replace(/\{__%24__\}/g, "$");
 					msg.html(msg_html)
 						.find("pre."+source_lang)
@@ -322,21 +324,38 @@ $(function() {
 
 					$li.addClass("source_code");
 				}
-				else {
+
+//				// marked up
+//				var md_parts = $options.re_marked.exec(msg_html.replace(/\$/g, "{__%24__}"));
+//				if (md_parts) {
+//
+//					msg_html = msg_html
+//						.replace($options.re_marked, marked(md_parts[2].replace(/<\/code>/g, "")))
+//						.replace(/\{__%24__\}/g, "$");
+//
+//					msg.html(msg_html).addClass("markdown-body");
+//
+//					$li.addClass("marked");
+//				}
+
+				if (!$li.hasClass("source_code")) {
 					var re_current = $options.re_current;
 					var re_user = $options.re_user;
 					var re_table = $options.re_table;
 					var re_hex = $options.re_hex;
 					var re_me = $options.re_me;
+					var re_href = $options.re_href;
 
 					// current
 					if (re_current.test(msg_html)) {
 						msg_html = msg_html.replace(re_current, "<span class='curr'>$1</span>");
+						msg_html = msg_html.replace(re_href, function(str) { return str.replace(/<[^>]*>/g, "")});
 						msg.html(msg_html);
 					}
 					// users
 					if (re_user.test(msg_html)) {
 						msg_html = msg_html.replace(re_user, "<span class='user'>$1</span>");
+						msg_html = msg_html.replace(re_href, function(str) { return str.replace(/<[^>]*>/g, "")});
 						msg.html(msg_html);
 					}
 					// <Leader>me
@@ -374,6 +393,7 @@ $(function() {
 				});
 				msg.html(msg_html);
 			}
+
 		}
 
 		return true;

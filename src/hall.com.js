@@ -15,7 +15,7 @@ $(function() {
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
-		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B'"<]|$)/gi,
+		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)/gi, //"
 		re_me: /(^|^(?:<code>)|[^\B\/"'\S>])\/me([ ]|$)/g, // "
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
@@ -429,9 +429,9 @@ $(function() {
 			// bugs
 			var re_bug = $options.re_bug;
 			if (re_bug.test(msg_html)) {
-				msg_html = msg_html.replace(re_bug, function(str_not_used, p1, p2, p3, p4) {
+				msg_html = msg_html.replace(re_bug, function(str_not_used, p1, p2, p3) {
 					p2 = p2.toUpperCase();
-					return p1+'<a href="http://bugtracker/browse/'+p2+'-'+p3+'" target="_blank">'+p2+'-'+p3+'</a>'+p4;
+					return p1+'<a href="http://bugtracker/browse/'+p2+'-'+p3+'" target="_blank">'+p2+'-'+p3+'</a>';
 				});
 				msg.html(msg_html);
 			}

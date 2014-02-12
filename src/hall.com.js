@@ -16,10 +16,10 @@ $(function() {
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
 		re_bug: /(^|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)([^\B'"<]|$)/gi,
-		re_me: /(^|[^\B\/"'\S>])\/me([^\B'"<]|$)/g,
+		re_me: /(^|^(?:<code>)|[^\B\/"'\S>])\/me([ ]|$)/g, // "
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
-		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,    //' " {
+		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,    //'"{
 		// hashes
 		ols: {},
 		bots: {},
@@ -290,6 +290,13 @@ $(function() {
 						return '<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span> is '+p1+(p2?' says "'+p2+'"':'');
 					});
 					msg.html(msg_html);
+
+					// remove empty divs that are siblings to /me
+					msg.siblings("div.content").
+						each(function(i_not_used, div) {
+							$(div).html() || $(div).remove();
+						});
+
 					$li.addClass("me");
 				}
 				// robot messages
@@ -390,6 +397,13 @@ $(function() {
 					if (re_me.test(msg_html)) {
 						msg_html = msg_html.replace(re_me, '$1<span class="'+(curr_user?"curr":"user")+'">'+cite_text+'</span>$2');
 						msg.html(msg_html);
+
+						// remove empty divs that are siblings to /me
+						msg.siblings("div.content").
+							each(function(i_not_used, div) {
+								$(div).html() || $(div).remove();
+							});
+
 						$li.addClass("me");
 					}
 

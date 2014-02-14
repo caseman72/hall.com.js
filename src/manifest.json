@@ -15,5 +15,5 @@
    "name": "hall.com.hl.js",
    "update_url": "https://raw.github.com/caseman72/hall.com.js/master/update_manifest.xml",
    "permissions": [ "activeTab" ],
-   "version": "1.9.3"
+   "version": "1.9.4"
 }

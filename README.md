@@ -41,8 +41,8 @@ hall.com.js
 ### Installation
 
 1. Save to CRX to computer
-  1. https://github.com/caseman72/hall.com.js/blob/master/extension/hall.com.hl.js.crx
-  2. "Right Click" and select a variation of "Save As..."
+  1. "Right Click" and select a variation of "Save As..."
+  2. https://github.com/caseman72/hall.com.js/raw/master/extension/hall.com.hl.js.crx
   3. Save to "Desktop"
 
 2. Open Chrome Extensions

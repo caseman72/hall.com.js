@@ -124,6 +124,14 @@ span.hex-preview {
 	background-color: transparent;
 }
 
+/* sent checkbox */
+
+.hall-listview-li.sent .indicators .sent {
+	float: left;
+	margin-top: -10px;
+	margin-left: -48px;
+}
+
 /* this is the style from the code highlighter */
 
 .sh_typical {

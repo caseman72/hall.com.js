@@ -15,7 +15,8 @@ $(function() {
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
-		re_bug: /(^|(?:<code>)|[^\B\/"'>])(vis|ar|hd|tardis)[-]([0-9]+)/gi, //"
+		re_bug: /(^|(?:<code>|<li>)|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)/gi, //"
+		re_trulia_bug: /(^|(?:<code>|<li>)|[^\B\/"'>])(tardis)[-]([0-9]+)/gi, //"
 		re_me: /(^|^(?:<code>)|[^\B\/"'\S>])\/me([ ]|$)/g, // "
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
@@ -434,6 +435,19 @@ $(function() {
 					return p1+'<a href="http://bugtracker/browse/'+p2+'-'+p3+'" target="_blank">'+p2+'-'+p3+'</a>';
 				});
 				msg.html(msg_html);
+			}
+
+			// bugs
+			var re_trulia_bug = $options.re_trulia_bug;
+			if (re_trulia_bug.test(msg_html)) {
+				msg_html = msg_html.replace(re_trulia_bug, function(str_not_used, p1, p2, p3) {
+					p2 = p2.toUpperCase();
+					return p1+'<a href="http://jira.corp.trulia.com/browse/'+p2+'-'+p3+'" target="_blank">'+p2+'-'+p3+'</a>';
+				});
+				msg.html(msg_html);
+			}
+			else {
+				console.log(msg_html, re_trulia_bug);
 			}
 
 		}

@@ -15,7 +15,7 @@ $(function() {
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
-		re_bug: /(^|(?:<code>)|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)/gi, //"
+		re_bug: /(^|(?:<code>)|[^\B\/"'>])(vis|ar|hd|tardis)[-]([0-9]+)/gi, //"
 		re_me: /(^|^(?:<code>)|[^\B\/"'\S>])\/me([ ]|$)/g, // "
 		re_hr: /\n?[-]{10,}([<\n])/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,

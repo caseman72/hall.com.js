@@ -16,9 +16,9 @@ $(function() {
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
 		re_bug: /(^|(?:<code>|<li>)|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)/gi, //"
-		re_trulia_bug: /(^|(?:<code>|<li>)|[^\B\/"'>])(tardis)[-]([0-9]+)/gi, //"
+		re_trulia_bug: /(^|(?:<code>|<li>)|[^\B\/"'>])(tardis|ent)[-]([0-9]+)/gi, //"
 		re_me: /(^|^(?:<code>)|[^\B\/"'\S>])\/me([ ]|$)/g, // "
-		re_hr: /\n?[-]{10,}([<\n])/g,
+		re_hr: /\n?[-]{10,}([<\n"]|$)/g,
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
 		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,    //'"{
 		// hashes
@@ -199,7 +199,7 @@ $(function() {
 		var $options = $.hall_object;
 
 		// this may fail in other instance if :first isn't the main place for members
-		var rooms = $(".rooms:first").find("a[data-route^='rooms']");
+		var rooms = $("#Layouts_ConversationsGroups").find("[data-route^='rooms']");
 
 		// init loop to define all rooms as not-processed
 		rooms.each(function(i_not_used, elem) {
@@ -447,7 +447,7 @@ $(function() {
 				msg.html(msg_html);
 			}
 			else {
-				console.log(msg_html, re_trulia_bug);
+				//console.log(msg_html, re_trulia_bug);
 			}
 
 		}

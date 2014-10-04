@@ -19,9 +19,13 @@ li.b4 {
 
 /* current user's background color */
 
-li.current_user {
+li.current_user > .message-mod {
 	background-color: rgba(82, 168, 236, 0.08);
+	margin-top: -3px;
+	padding-top: 3px;
+	padding-bottom: 3px;
 }
+
 li.standup {
 	background-color: rgba(0, 0, 0, 0.04);
 }
@@ -47,8 +51,19 @@ span.user {
 
 /* git bot messages */
 
-.hall-listview-chat li.git_bot {
+.hall-listview-chat [data-sender='Chris Marinic'] .image[style='background-image:url();'] {
+	background-image: url('http://img3.wikia.nocookie.net/__cb20131129174144/lego/images/b/bd/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA.png') !important;
+}
+
+.hall-listview-chat [data-sender='Forrest Corbett'] .image[style='background-image:url(https://d3bkj0l4dzdp7x.cloudfront.net/production/public/users/1667540/medium/photo.jpg);'] {
+	background-image: url('http://www.clipartbest.com/cliparts/9TR/a97/9TRa9785c.png') !important;
+}
+
+.hall-listview-chat li.git_bot > .message-mod {
 	background-color: rgba(236, 168, 82, 0.08);
+	margin-top: -3px;
+	padding-top: 3px;
+	padding-bottom: 3px;
 }
 
 /* sytle of the multiline content */
@@ -97,6 +112,7 @@ span.hex-preview {
 .hall-listview-chat li.nested pre.content,
 .hall-listview-chat li.git_bot .content,
 .hall-listview-chat li pre.content {
+	font-family: monospace, monospace;
 	padding-right: 0;
 	padding-left: 0;
 }

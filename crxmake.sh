@@ -22,8 +22,8 @@ if test $# -lt 2; then
 	echo "Usage:"
 	echo "crxmake.sh <extension dir> <pem path> [output.crx]"
 	echo ""
-	echo "crxmake.sh src extension/hall.com.hl.js.pem extension/hall.com.hl.js.crx"
-	echo "crxmake.sh src extension/hall.com.hl.js.pem extension/hall.com.hl.js.crx version.txt"
+	echo "crxmake.sh src extension/hall.com.js.pem extension/hall.com.js.crx"
+	echo "crxmake.sh src extension/hall.com.js.pem extension/hall.com.js.crx version.txt"
 	echo ""
 	exit 1
 else
@@ -63,7 +63,8 @@ zip="$name.zip"
 trap 'rm -f "$pub" "$sig" "$zip"' EXIT
 
 # zip up the crx dir
-(cd "$src" && zip -qr -9 -X "$cwd/$zip" .  -x \*.rcs\*)
+(cd "$src" && zip -qr -9 -X "$cwd/$zip" . -x \*.rcs\* && cp "$cwd/$zip" "../extension/hall.com.js.zip")
+
 
 # signature
 openssl sha1 -sha1 -binary -sign "$pem" < "$zip" > "$sig"

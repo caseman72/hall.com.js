@@ -15,12 +15,12 @@ $(function() {
 		re_status: /^(?:<code>)?(?:\/(here|available|away|gone|brb|out|l8r|dnd|busy))([\s\S]*)/,
 		re_table: /\n?(?:[-]{4,}[+])+(?:[<\n])/,
 		re_hex: /(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\(.*?\))/g,
-		re_bug: /(^|(?:<code>|<li>)|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)/gi, //"
-		re_trulia_bug: /(^|(?:<code>|<li>)|[^\B\/"'>])(tardis|ent)[-]([0-9]+)/gi, //"
-		re_me: /(^|^(?:<code>)|[^\B\/"'\S>])\/me([ ]|$)/g, // "
-		re_hr: /\n?[-]{10,}([<\n"]|$)/g,
+		re_bug: /(^|(?:<code>|<li>|<p>)|[^\B\/"'>])(vis|ar|hd)[-]([0-9]+)/gi, // '"
+		re_trulia_bug: /(^|(?:<code>|<li>|<p>)|[^\B\/"'>])(tardis|ent)[-]([0-9]+)/gi, // '"
+		re_me: /(^|^(?:<code>)|[^\B\/"'\S>])\/me([ ]|$)/g, // '"
+		re_hr: /\n?[-]{10,}([<\n"]|$)/g, //"
 		re_ds: /(?:[ ]{2,}|\n|\r|\t)+/g,
-		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,    //'"{
+		re_href: /[ ]href=(?:"[^"]*"|'[^']*')/g,    // '"{ ""
 		// hashes
 		ols: {},
 		bots: {},
@@ -446,10 +446,9 @@ $(function() {
 				});
 				msg.html(msg_html);
 			}
-			else {
-				//console.log(msg_html, re_trulia_bug);
-			}
-
+//			else {
+//				console.log(msg_html, re_trulia_bug);
+//			}
 		}
 
 		return true;
